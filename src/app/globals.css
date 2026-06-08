@@ -1,26 +1,105 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  DESIGN DECISION
+  ----------------
+  One committed move: an editorial-brutalist system in near-black + warm
+  off-white, anchored by a SINGLE high-voltage accent (electric lime, --volt).
+  Type does the heavy lifting: oversized "Archivo" display weights set tight
+  and left-aligned (never the centered-hero look), with "JetBrains Mono" for
+  section labels, indices, and stack tags. This reads as a builder's site —
+  confident and a little aggressive, matching the "Maximum" name — and pointedly
+  avoids the generic AI-startup template (centered hero, three line-icon cards,
+  purple gradient, Inter everywhere).
+*/
+
+@theme {
+  --color-ink: #0a0a0b; /* canvas */
+  --color-ink-raised: #131316; /* cards / raised surfaces */
+  --color-paper: #f5f3ec; /* primary text, warm off-white */
+  --color-muted: #b6b2a6; /* secondary text — AA on ink */
+  --color-volt: #c6f135; /* the single accent */
+  --color-volt-deep: #9fc400; /* deeper accent variant */
+  --color-line: rgba(245, 243, 236, 0.12); /* hairlines */
+
+  --font-display: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem; /* offset for sticky nav on anchor jumps */
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Visible, on-brand focus ring for keyboard navigation. */
+  :focus-visible {
+    outline: 2px solid var(--color-volt);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-volt);
+    color: #0a0a0b;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Tight, optical display type. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* Entrance motion driven by IntersectionObserver (see Reveal.tsx). */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .reveal[data-shown="true"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Respect users who don't want motion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

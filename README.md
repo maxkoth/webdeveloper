@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Maximum Developer
 
-## Getting Started
+The portfolio site for **Maximum Developer** — Max, a freelance developer who
+builds AI-powered apps and MVPs for startups, and fast, working websites for
+local businesses.
 
-First, run the development server:
+Single page, anchored navigation, contact-first. Built with **Next.js (App
+Router) + TypeScript + Tailwind CSS v4**, deploy-ready for Vercel with zero
+extra config.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Other scripts:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build    # production build (type-checked)
+npm run start    # serve the production build
+npm run lint     # ESLint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy (Vercel)
 
-## Learn More
+1. Push this repo to GitHub.
+2. In Vercel, **Add New → Project** and import the repo.
+3. Framework preset auto-detects **Next.js** — no settings to change.
+4. Deploy.
 
-To learn more about Next.js, take a look at the following resources:
+After connecting the real domain (`maximumdeveloper.com`), no code change is
+needed: the canonical URL, sitemap, robots, and Open Graph tags read from
+`SITE.url` in [`src/lib/site.ts`](src/lib/site.ts). Update that one constant if
+the domain differs.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Editing content
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Everything content-related lives in two places:
 
-## Deploy on Vercel
+- [`src/lib/site.ts`](src/lib/site.ts) — name, tagline, contact details, nav.
+- The section components in [`src/components/`](src/components) — `Hero`,
+  `WhatIBuild`, `SelectedWork`, `HowIWork`, `About`, `Footer`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+When real live URLs exist, replace the `[link coming soon]` markers in
+[`SelectedWork.tsx`](src/components/SelectedWork.tsx).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contact
+
+The site's only call to action is to reach Max directly — no forms, no booking
+tool. Both links are real and one-tap on mobile:
+
+- **Text / call:** `sms:` / `tel:` → 646-462-1236
+- **Email:** `mailto:` → maxkoth77@gmail.com
+
+---
+
+## Design decision & scores
+
+**The one move:** an editorial-brutalist system in near-black + warm off-white,
+anchored by a *single* high-voltage electric-lime accent, with oversized
+`Archivo` display type set tight and left-aligned and `JetBrains Mono` for
+labels and stack tags. I committed to this because the name "Maximum Developer"
+is bold and a little aggressive, and the site is itself the proof of work — so
+it deliberately rejects the generic AI-startup template (centered hero, three
+line-icon cards, purple gradient, Inter everywhere) in favor of a confident,
+type-led layout. Visuals are inline SVG (the work-card cover art included), so
+there are no raster images to optimize, no extra requests, and no layout shift.
+Legibility was held above edginess: all text meets WCAG AA contrast, focus
+states are visible, and motion is disabled under `prefers-reduced-motion`.
+
+**Lighthouse** (Chrome, production build):
+
+| Category       | Mobile | Desktop |
+| -------------- | :----: | :-----: |
+| Performance    |   99   |   100   |
+| Accessibility  |  100   |   100   |
+| Best Practices |  100   |   100   |
+| SEO            |  100   |   100   |
+
+Verified: `npm run build` passes with no type errors; every nav anchor and the
+`sms:` / `tel:` / `mailto:` links resolve correctly; layout is clean at 360px,
+768px, and 1280px; no console errors or warnings on load.

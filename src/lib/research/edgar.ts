@@ -79,6 +79,40 @@ function latestYear(map: Map<number, number>): number | null {
   return Math.max(...map.keys());
 }
 
+/** Distinct positive fact values at the latest period end, preferring annual
+ *  forms. `kind` selects full-year DURATION facts vs balance-sheet INSTANT
+ *  facts. Used for share counts, where multiple share classes appear as
+ *  several facts sharing the same end date. */
+function distinctAtLatestPeriod(facts: Fact[], kind: "duration" | "instant"): number[] {
+  const isKind = (f: Fact) => {
+    if (kind === "instant") return !f.start;
+    if (!f.start) return false;
+    const days = (Date.parse(f.end) - Date.parse(f.start)) / 86_400_000;
+    return days >= 330 && days <= 372;
+  };
+  let pool = facts.filter((f) => f.form && ANNUAL_FORMS.has(f.form) && isKind(f));
+  if (!pool.length) pool = facts.filter(isKind);
+  if (!pool.length) return [];
+  const latestEnd = pool.reduce((m, f) => (f.end > m ? f.end : m), pool[0].end);
+  const at = pool.filter((f) => f.end === latestEnd);
+  return [...new Set(at.map((f) => f.val))].filter((v) => isFinite(v) && v > 0);
+}
+
+/** Total diluted share count, robust to multiple share classes (the bug that
+ *  made Visa/Mastercard look 4–10× undervalued: only one class was counted).
+ *  Uses the LARGER of (a) the max single weighted-average-diluted value — which
+ *  for as-converted filers like Visa is the full ~2.03B total — and (b) the SUM
+ *  of the distinct dei cover-page class counts. Biasing to the larger count
+ *  keeps the per-share valuation conservative when the two sources disagree. */
+export function extractShares(cf: CompanyFacts): number | null {
+  const diluted = conceptFacts(cf, "us-gaap", TAGS.dilutedShares, "shares");
+  const dilutedMax = diluted ? Math.max(0, ...distinctAtLatestPeriod(diluted, "duration")) : 0;
+  const dei = conceptFacts(cf, "dei", ["EntityCommonStockSharesOutstanding"], "shares");
+  const deiSum = dei ? distinctAtLatestPeriod(dei, "instant").reduce((s, v) => s + v, 0) : 0;
+  const shares = Math.max(dilutedMax, deiSum);
+  return shares > 0 ? shares : null;
+}
+
 /** Value at `year`, else the most recent value not after `year`, else latest. */
 function valueAt(map: Map<number, number>, year: number | null): number | null {
   if (map.size === 0) return null;
@@ -206,25 +240,8 @@ export function computeFundamentals(cf: CompanyFacts): Fundamentals {
   const sti = inst("shortTermInvestments");
   const equity = inst("equity");
 
-  // Shares: prefer dei common-shares-outstanding (instant), else weighted diluted.
-  let dilutedShares: number | null = null;
-  const deiShares = conceptFacts(cf, "dei", ["EntityCommonStockSharesOutstanding"], "shares");
-  if (deiShares) {
-    const m = annualInstants(deiShares);
-    dilutedShares = valueAt(m, latestYear(m));
-    if (dilutedShares == null) {
-      // dei shares are often filed on cover (not a 10-K instant); take latest raw.
-      const sorted = [...deiShares].sort((a, b) => Date.parse(b.end) - Date.parse(a.end));
-      dilutedShares = sorted[0]?.val ?? null;
-    }
-  }
-  if (dilutedShares == null) {
-    const wad = conceptFacts(cf, "us-gaap", TAGS.dilutedShares, "shares");
-    if (wad) {
-      const m = annualDurations(wad);
-      dilutedShares = valueAt(m, latestYear(m));
-    }
-  }
+  // Total diluted shares, aggregated across share classes (see extractShares).
+  const dilutedShares = extractShares(cf);
   if (dilutedShares == null) missing.push("shares");
 
   const fy = latestYear(revenue) ?? latestYear(netIncome);

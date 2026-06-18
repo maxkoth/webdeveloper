@@ -101,7 +101,9 @@ function TopBar() {
       <Link href="/" className="transition-colors hover:text-paper">
         ← Maximum<span className="text-volt">.</span>
       </Link>
-      <span>Value research · {ANALYSIS_DATE}</span>
+      <Link href="/screener" className="transition-colors hover:text-paper">
+        Live screener →
+      </Link>
     </div>
   );
 }

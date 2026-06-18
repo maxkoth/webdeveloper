@@ -146,8 +146,9 @@ export async function GET(request: NextRequest) {
     { since, quotes },
     {
       headers: {
-        // Cache briefly at the edge; prices needn't be tick-fresh for this use.
-        "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1800",
+        // Short edge cache so client polling (~60s) sees fresh quotes without
+        // hammering the upstream feed on every visitor's every poll.
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
       },
     },
   );

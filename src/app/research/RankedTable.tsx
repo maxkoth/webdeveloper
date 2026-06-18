@@ -11,7 +11,7 @@ import { money, pct } from "@/lib/research/format";
  * the buy-below column is static. Rows with no available price sort last.
  */
 export default function RankedTable() {
-  const { quotes, status } = useQuotes();
+  const { quotes, status, lastUpdated } = useQuotes();
 
   const rows = DEEP_DIVES.map((d) => {
     const v = valuation(d.assumptions);
@@ -34,6 +34,15 @@ export default function RankedTable() {
 
   return (
     <div className="overflow-x-auto rounded-xl border border-line">
+      <div className="flex items-center justify-between border-b border-line px-4 py-2.5 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted">
+        <span className="flex items-center gap-2">
+          <span className={`h-1.5 w-1.5 rounded-full ${status === "ready" ? "bg-volt" : "bg-muted"}`} aria-hidden />
+          {status === "ready" ? "Live · auto-refreshes" : status === "loading" ? "Connecting…" : "Prices unavailable"}
+        </span>
+        {lastUpdated && (
+          <span>Updated {new Date(lastUpdated).toLocaleTimeString()}</span>
+        )}
+      </div>
       <table className="w-full min-w-[640px] border-collapse text-left">
         <caption className="sr-only">Candidates ranked by live margin of safety</caption>
         <thead>

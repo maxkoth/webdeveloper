@@ -176,6 +176,12 @@ const TAGS = {
     "Cash",
   ],
   shortTermInvestments: ["ShortTermInvestments", "MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesCurrent"],
+  // Long-term MARKETABLE securities only (Apple-style balance sheets park tens of
+  // billions here). These are cash-like and were previously ignored, which
+  // understated net cash and made cash-rich quality businesses look too
+  // expensive. Deliberately excludes generic "LongTermInvestments" (can be
+  // illiquid strategic stakes) to stay conservative.
+  longTermMarketable: ["MarketableSecuritiesNoncurrent", "AvailableForSaleSecuritiesNoncurrent"],
   equity: ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"],
   dilutedShares: [
     "WeightedAverageNumberOfDilutedSharesOutstanding",
@@ -203,7 +209,7 @@ export type Fundamentals = {
   fcfCAGR: number | null;
   ebitda: number | null;
   roic: number | null;
-  netCash: number | null; // cash + ST investments − total debt
+  netCash: number | null; // cash + ST + LT marketable securities − total debt
   netDebtToEbitda: number | null;
   dilutedShares: number | null; // actual share count
   /** Concepts that could not be resolved (transparency for verification). */
@@ -238,6 +244,7 @@ export function computeFundamentals(cf: CompanyFacts): Fundamentals {
   const curDebt = inst("debtCurrent");
   const cash = inst("cash");
   const sti = inst("shortTermInvestments");
+  const ltMkt = inst("longTermMarketable");
   const equity = inst("equity");
 
   // Total diluted shares, aggregated across share classes (see extractShares).
@@ -262,7 +269,8 @@ export function computeFundamentals(cf: CompanyFacts): Fundamentals {
   const fcfMargin = fcfLatest != null && revenueVal ? fcfLatest / revenueVal : null;
 
   const debtTotal = (valueAt(ltDebt, fy) ?? 0) + (valueAt(curDebt, fy) ?? 0);
-  const cashTotal = (valueAt(cash, fy) ?? 0) + (valueAt(sti, fy) ?? 0);
+  const cashTotal =
+    (valueAt(cash, fy) ?? 0) + (valueAt(sti, fy) ?? 0) + (valueAt(ltMkt, fy) ?? 0);
   const netCash = cashTotal - debtTotal;
 
   const opIncVal = valueAt(opInc, fy);

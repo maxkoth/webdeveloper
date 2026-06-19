@@ -8,6 +8,8 @@
     "start": "node src/index.js",
     "live": "bash run.sh",
     "scan:once": "node src/index.js --once",
+    "value": "node src/value-run.js --once",
+    "value:watch": "node src/value-run.js",
     "backtest": "node src/backtest-run.js",
     "test": "node --test"
   },

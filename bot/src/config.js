@@ -42,6 +42,16 @@ export const config = {
     maxCandidates: 150,
   },
 
+  // Long-term value BUY alerts (npm run value). Calls the site's /api/screen
+  // (SEC-fundamentals cache + DCF) and texts quality businesses trading at/below
+  // their margin-of-safety buy price. Requires the website running (npm run dev).
+  value: {
+    screenUrl: process.env.VALUE_SCREEN_URL || "http://localhost:3000/api/screen",
+    statuses: ["bargain"], // "bargain" = at/below buy-below line. Add "fair" to widen.
+    cooldownHours: 24 * 7, // don't re-text the same name within a week
+    maxPerRun: 20,
+  },
+
   // Stage 2 — signal thresholds + risk model.
   signals: {
     emaFast: 9,

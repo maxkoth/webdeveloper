@@ -8,39 +8,59 @@
 import { detectSetups } from "./signals.js";
 
 /**
- * Simulate a long trade forward from the bar AFTER entry.
+ * Simulate a long trade to its stop or target, with realistic frictions.
+ * @param trade  {entry, stop, target}  entry is the ACTUAL fill price.
+ * @param futureBars  bars from the entry bar onward (entry bar can trigger).
+ * @param opts  {maxHoldBars, slippageBps}  slippage haircuts every fill.
  * @returns {{outcome:"win"|"loss"|"timeout", r:number}}  r in risk multiples.
  */
-export function evaluateTrade(setup, futureBars, maxHoldBars) {
-  const risk = setup.entry - setup.stop;
+export function evaluateTrade(trade, futureBars, opts) {
+  const { maxHoldBars, slippageBps = 0 } = opts;
+  const slip = slippageBps / 10000;
+  const risk = trade.entry - trade.stop;
   if (risk <= 0) return { outcome: "loss", r: 0 };
   const horizon = futureBars.slice(0, maxHoldBars);
   for (const b of horizon) {
-    const hitStop = b.l <= setup.stop;
-    const hitTarget = b.h >= setup.target;
-    // If a bar spans both, assume the stop filled first (conservative).
-    if (hitStop) return { outcome: "loss", r: -1 };
-    if (hitTarget) return { outcome: "win", r: setup.rr };
+    // If a bar spans both stop and target, assume the stop filled first.
+    if (b.l <= trade.stop) {
+      const exit = trade.stop * (1 - slip); // sell into slippage
+      return { outcome: "loss", r: (exit - trade.entry) / risk };
+    }
+    if (b.h >= trade.target) {
+      const exit = trade.target * (1 - slip);
+      return { outcome: "win", r: (exit - trade.entry) / risk };
+    }
   }
-  // Neither hit within the horizon: mark to the last close.
   const last = horizon[horizon.length - 1];
   if (!last) return { outcome: "timeout", r: 0 };
-  return { outcome: "timeout", r: (last.c - setup.entry) / risk };
+  const exit = last.c * (1 - slip);
+  return { outcome: "timeout", r: (exit - trade.entry) / risk };
 }
 
 /** Replay one session's bars: at each bar, run the engine on history-to-date;
- *  the first time each setup type fires that day, take the trade and score it. */
+ *  the first time each setup type fires that day, take the trade and score it.
+ *  Entry is the NEXT bar's open (you can't fill at the signal-bar close) plus a
+ *  slippage haircut — the realism that decides whether a thin edge survives. */
 export function backtestBars(symbol, bars, cfg) {
   const trades = [];
   const takenTypes = new Set();
+  const slip = (cfg.backtest.slippageBps || 0) / 10000;
   for (let i = cfg.signals.minBars - 1; i < bars.length - 1; i++) {
     const window = bars.slice(0, i + 1);
     const setups = detectSetups({ symbol, bars: window }, cfg.signals);
     for (const s of setups) {
       if (takenTypes.has(s.type)) continue;
       takenTypes.add(s.type);
-      const result = evaluateTrade(s, bars.slice(i + 1), cfg.backtest.maxHoldBars);
-      trades.push({ ...s, ...result, atBar: i });
+      const next = bars[i + 1];
+      // Fill at next bar's open (signalClose mode keeps the optimistic old model).
+      const fillBase = cfg.backtest.entryMode === "signalClose" ? s.entry : next.o;
+      const entry = fillBase * (1 + slip); // buy into slippage
+      const trade = { entry, stop: s.stop, target: s.target };
+      const result = evaluateTrade(trade, bars.slice(i + 1), {
+        maxHoldBars: cfg.backtest.maxHoldBars,
+        slippageBps: cfg.backtest.slippageBps,
+      });
+      trades.push({ ...s, entryFill: round(entry), ...result, atBar: i });
     }
   }
   return trades;
@@ -69,4 +89,9 @@ export function summarizeByType(trades) {
   const byType = {};
   for (const t of trades) (byType[t.type] ||= []).push(t);
   return Object.fromEntries(Object.entries(byType).map(([k, ts]) => [k, summarize(ts)]));
+}
+
+function round(x, dp = 2) {
+  const m = 10 ** dp;
+  return Math.round(x * m) / m;
 }

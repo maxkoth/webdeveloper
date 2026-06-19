@@ -55,8 +55,11 @@ export const config = {
 
   // Backtest: how a fired setup is scored against subsequent bars.
   backtest: {
-    lookbackDays: 10, // trading days to replay
+    lookbackDays: 10, // trading days to replay (raise this — 10 is a tiny sample)
     maxHoldBars: 120, // close the trade if neither stop nor target hits in N bars
+    entryMode: "nextOpen", // "nextOpen" (realistic) | "signalClose" (optimistic)
+    slippageBps: 5, // per-fill haircut, basis points. 5 = 0.05% each side. Raise
+    // this for fast/illiquid names — momentum entries slip more than you think.
   },
 
   alerts: { cooldownMin: 60, maxPerScan: 8 },

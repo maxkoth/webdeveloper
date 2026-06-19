@@ -37,7 +37,8 @@ async function main() {
   const days = recentTradingDays(config.backtest.lookbackDays, config.session.timezone);
 
   console.log(
-    `Backtest [${provider.name}/${config.alpaca.feed}] · ${watch.length} symbols · ${days.length} days\n`,
+    `Backtest [${provider.name}/${config.alpaca.feed}] · ${watch.length} symbols · ${days.length} days\n` +
+      `entry=${config.backtest.entryMode} · slippage=${config.backtest.slippageBps}bps/side\n`,
   );
 
   const allTrades = [];

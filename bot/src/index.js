@@ -2,12 +2,20 @@
 // `--once` runs a single pass and exits (useful for testing / cron).
 
 import cron from "node-cron";
+import { DateTime } from "luxon";
 import { config, validateConfig } from "./config.js";
 import { makeProvider } from "./providers/index.js";
 import { Notifier } from "./notifier.js";
 import { AlertState } from "./state.js";
 import { runScan } from "./scanner.js";
 import { isWithinSession, nowET } from "./clock.js";
+
+// Prefix every log line with an ET timestamp so an overnight log file is
+// reviewable ("when did this fire?").
+const _log = console.log.bind(console);
+const _stamp = () => DateTime.now().setZone(config.session.timezone).toFormat("MM-dd HH:mm:ss");
+console.log = (...a) => _log(`[${_stamp()}]`, ...a);
+console.error = (...a) => _log(`[${_stamp()}] ERROR`, ...a);
 
 const BANNER = `
 ╔══════════════════════════════════════════════════════════════════╗

@@ -50,9 +50,32 @@ the SID/token into `.env`.
 npm run backtest                  # score the rules over recent history (default symbols)
 npm run backtest AAPL TSLA NVDA   # ...or your own symbols
 npm start                         # live scanner, dry-run (console alerts, no texts)
+npm run live                      # unattended run: keeps Mac awake, logs to file, auto-restarts
 npm run scan:once                 # single scan pass and exit
 npm test                          # verify indicator/signal/backtest math (no API needed)
 ```
+
+### Leaving it running unattended (e.g. start Sunday night for Monday)
+
+```bash
+cd ~/webdeveloper/bot
+npm run live          # or: ./run.sh
+```
+
+`run.sh` wraps the scanner in `caffeinate` (so the Mac won't sleep and the 4am
+scan actually fires), writes a timestamped log to `bot/logs/`, and relaunches if
+it crashes. **Keep the laptop lid OPEN and the charger plugged in** — a MacBook
+sleeps on lid-close regardless of caffeinate. Stop with Ctrl+C. Review the run
+afterward in `bot/logs/scanner-*.log`.
+
+Two honest caveats for a 4am start on the **free IEX feed**:
+- **Premarket (4:00–9:30) will be thin or empty.** IEX is a small exchange and
+  the free screener barely populates before the open; expect real activity only
+  after 9:30. True premarket coverage needs the paid `sip` feed ($99/mo) — don't
+  buy it until the strategy has proven itself in observation.
+- Keep `MODE=dry-run` for the first live days. It logs every setup so you can
+  compare it against what actually happened. **Don't trade these with real
+  money until weeks of observation/paper say it's worth it.**
 
 Reading the backtest report: **expectancyR** is average R per trade (positive =
 edge, before costs), **PF** is profit factor (gross win ÷ gross loss; >1.5 is

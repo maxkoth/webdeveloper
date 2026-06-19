@@ -6,6 +6,7 @@
   "description": "Alerts-only intraday setup scanner. Scans the US universe via Polygon, detects rule-based setups (VWAP reclaim, EMA cross + volume, candlestick, relative-volume catalyst), and texts entry/SL/TP via Twilio. NOT financial advice; never places trades.",
   "scripts": {
     "start": "node src/index.js",
+    "live": "bash run.sh",
     "scan:once": "node src/index.js --once",
     "backtest": "node src/backtest-run.js",
     "test": "node --test"

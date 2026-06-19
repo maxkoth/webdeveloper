@@ -15,6 +15,7 @@ export const config = {
     keyId: process.env.ALPACA_KEY_ID || "",
     secret: process.env.ALPACA_SECRET_KEY || "",
     feed: process.env.ALPACA_FEED || "iex", // "iex" (free) or "sip" (paid real-time)
+    paper: process.env.ALPACA_PAPER !== "false", // paper keys by default (set false for live keys)
   },
   polygon: {
     apiKey: process.env.POLYGON_API_KEY || "",

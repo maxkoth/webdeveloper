@@ -89,12 +89,19 @@ export function alpacaProvider() {
       return out;
     },
     // All active, tradable US equity symbols (the real gapper universe lives in
-    // small-caps, not a hand-picked large-cap list). Free endpoint.
+    // small-caps, not a hand-picked large-cap list). Free endpoint — note it's
+    // on the TRADING API, so it needs the matching base for paper vs live keys.
     async getAssets(cfg) {
-      const res = await fetch("https://api.alpaca.markets/v2/assets?status=active&asset_class=us_equity", {
+      const base = cfg.alpaca.paper ? "https://paper-api.alpaca.markets" : "https://api.alpaca.markets";
+      const res = await fetch(`${base}/v2/assets?status=active&asset_class=us_equity`, {
         headers: headers(cfg),
       });
-      if (!res.ok) throw new Error(`Alpaca assets ${res.status}`);
+      if (!res.ok) {
+        throw new Error(
+          `Alpaca assets ${res.status} — if 401/403, your keys may be live not paper ` +
+            `(set ALPACA_PAPER=false) or vice-versa.`,
+        );
+      }
       const arr = await res.json();
       return arr
         .filter((a) => a.tradable && /^[A-Z]+$/.test(a.symbol)) // common shares only

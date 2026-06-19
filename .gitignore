@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# generated fundamentals cache + raw SEC filings (built by npm run build:cache)
+/data/
+.cache/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

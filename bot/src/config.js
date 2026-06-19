@@ -72,6 +72,21 @@ export const config = {
     // this for fast/illiquid names — momentum entries slip more than you think.
   },
 
+  // Day-trade STRATEGY research (npm run backtest:strategies). Each strategy is a
+  // hypothesis to be tested, not a believed edge. Results split in/out-of-sample.
+  backtestDays: 60, // history to pull for strategy testing (more = less noise)
+  oosFraction: 0.3, // hold out the most recent 30% of days for out-of-sample
+  strategies: {
+    orbMinutes: 15, // opening-range length (first N minutes after 9:30)
+    gapMin: 0.04, // gap-and-go / selective: minimum overnight gap %
+    stopAtrMult: 1.0, // stop distance in ATRs
+    targetRR: 2, // reward:risk target
+    vwapDevAtr: 1.5, // vwap-reversion: how far below VWAP (in ATRs) to trigger
+    selectiveWindowMin: 90, // selective-trend: only trade the first N minutes
+    maxHoldBars: 120,
+    slippageBps: 5,
+  },
+
   alerts: { cooldownMin: 60, maxPerScan: 8 },
 };
 

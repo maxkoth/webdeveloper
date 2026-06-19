@@ -44,6 +44,12 @@ async function main() {
   // Small-cap gappers slip far more than large-caps; default full mode to 20bps.
   const defaultSlip = useFull ? 20 : config.strategies.slippageBps;
   const slipBps = process.env.GAP_SLIPPAGE_BPS != null ? Number(process.env.GAP_SLIPPAGE_BPS) : defaultSlip;
+  // Optional FIXED percentage exits (e.g. GAP_TP_PCT=20 GAP_SL_PCT=7) that
+  // override the strategy's ATR stop / 2R target. maxHold defaults higher when
+  // using a fat % target so it has the session to get there.
+  const tpPct = process.env.GAP_TP_PCT != null ? Number(process.env.GAP_TP_PCT) / 100 : null;
+  const slPct = process.env.GAP_SL_PCT != null ? Number(process.env.GAP_SL_PCT) / 100 : null;
+  const maxHold = Number(process.env.GAP_MAXHOLD) || (tpPct != null ? 390 : config.strategies.maxHoldBars);
 
   let universe = DAYTRADE_UNIVERSE;
   if (useFull) {
@@ -63,9 +69,12 @@ async function main() {
   const toMs = now.toMillis();
   const dateOf = (t) => DateTime.fromMillis(t, { zone: tz }).toISODate();
 
+  const exitLabel = tpPct != null || slPct != null
+    ? `exits: TP ${tpPct != null ? (tpPct * 100).toFixed(0) + "%" : "2R"} / SL ${slPct != null ? (slPct * 100).toFixed(0) + "%" : "ATR"} · hold ${maxHold}m`
+    : `exits: ATR stop / 2R target`;
   console.log(
     `Gap-and-go fair test [${provider.name}/${config.alpaca.feed}] · universe ${universe.length} · ~${days} days\n` +
-      `gap≥${(config.strategies.gapMin * 100).toFixed(0)}% · top ${config.gapTopK}/day · slippage=${slipBps}bps/side\n`,
+      `gap≥${(config.strategies.gapMin * 100).toFixed(0)}% · top ${config.gapTopK}/day · slippage=${slipBps}bps/side · ${exitLabel}\n`,
   );
 
   console.log("Fetching daily bars to find gappers… (full universe can take a few minutes)");
@@ -94,10 +103,12 @@ async function main() {
       const next = session.reg[hit.idx + 1];
       if (!next) continue;
       const entry = next.o * (1 + slipBps / 10000);
+      const stop = slPct != null ? entry * (1 - slPct) : hit.setup.stop;
+      const target = tpPct != null ? entry * (1 + tpPct) : hit.setup.target;
       const r = evaluateTrade(
-        { entry, stop: hit.setup.stop, target: hit.setup.target },
+        { entry, stop, target },
         session.reg.slice(hit.idx + 1),
-        { maxHoldBars: config.strategies.maxHoldBars, slippageBps: slipBps },
+        { maxHoldBars: maxHold, slippageBps: slipBps },
       );
       trades.push({ date, symbol: g.symbol, gapPct: g.gapPct, ...r });
     }

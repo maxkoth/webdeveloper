@@ -83,18 +83,21 @@ test("detectSetups returns nothing without enough bars", () => {
   assert.deepEqual(detectSetups({ symbol: "X", bars: [{ o: 1, h: 1, l: 1, c: 1, v: 1 }] }, config.signals), []);
 });
 
-test("prefilter keeps only liquid, moving, high-RVOL names", () => {
-  const tickers = [
+test("prefilter keeps only liquid, moving names (normalized rows)", () => {
+  const rows = [
     // mover + unusual volume → kept
-    { ticker: "GOOD", min: { c: 10 }, day: { v: 5_000_000 }, prevDay: { v: 2_000_000 }, todaysChangePerc: 6 },
-    // flat, low volume → dropped
-    { ticker: "FLAT", min: { c: 10 }, day: { v: 100_000 }, prevDay: { v: 5_000_000 }, todaysChangePerc: 0.2 },
+    { ticker: "GOOD", price: 10, dayVolume: 5_000_000, prevVolume: 2_000_000, changePct: 6 },
+    // flat, low volume → dropped (change below threshold)
+    { ticker: "FLAT", price: 10, dayVolume: 100_000, prevVolume: 5_000_000, changePct: 0.2 },
     // too cheap → dropped
-    { ticker: "PENNY", min: { c: 0.5 }, day: { v: 9_000_000 }, prevDay: { v: 1_000_000 }, todaysChangePerc: 40 },
+    { ticker: "PENNY", price: 0.5, dayVolume: 9_000_000, prevVolume: 1_000_000, changePct: 40 },
+    // Alpaca-style row: no prevVolume (relVol unknown) but moving → kept
+    { ticker: "ALP", price: 25, dayVolume: null, prevVolume: 0, changePct: 8 },
   ];
-  const out = prefilter(tickers, config, 0.5); // half-session elapsed
+  const out = prefilter(rows, config, 0.5);
   const kept = out.map((o) => o.ticker);
   assert.ok(kept.includes("GOOD"));
+  assert.ok(kept.includes("ALP"));
   assert.ok(!kept.includes("FLAT"));
   assert.ok(!kept.includes("PENNY"));
 });

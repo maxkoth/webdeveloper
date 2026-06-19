@@ -76,6 +76,7 @@ export const config = {
   // hypothesis to be tested, not a believed edge. Results split in/out-of-sample.
   backtestDays: 60, // history to pull for strategy testing (more = less noise)
   oosFraction: 0.3, // hold out the most recent 30% of days for out-of-sample
+  gapTopK: 15, // gap-and-go fair test: how many top gappers to trade each day
   strategies: {
     orbMinutes: 15, // opening-range length (first N minutes after 9:30)
     gapMin: 0.04, // gap-and-go / selective: minimum overnight gap %

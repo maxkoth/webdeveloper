@@ -12,6 +12,7 @@
     "value:watch": "node src/value-run.js",
     "backtest": "node src/backtest-run.js",
     "backtest:strategies": "node src/backtest-strategies.js",
+    "backtest:gap": "node src/backtest-gapandgo.js",
     "test": "node --test"
   },
   "dependencies": {

@@ -59,5 +59,34 @@ export function alpacaProvider() {
       const d = await aget(url, cfg);
       return (d.bars || []).map((b) => ({ t: Date.parse(b.t), o: b.o, h: b.h, l: b.l, c: b.c, v: b.v }));
     },
+    // Multi-symbol DAILY bars (for detecting gappers across a universe). Batches
+    // symbols and follows pagination. Returns Map<symbol, bars[]>.
+    async getDailyBars(cfg, symbols, fromMs, toMs) {
+      const out = new Map();
+      const CHUNK = 100;
+      for (let i = 0; i < symbols.length; i += CHUNK) {
+        const batch = symbols.slice(i, i + CHUNK);
+        let pageToken = null;
+        do {
+          const params = new URLSearchParams({
+            symbols: batch.join(","),
+            timeframe: "1Day",
+            start: new Date(fromMs).toISOString(),
+            end: new Date(toMs).toISOString(),
+            limit: "10000",
+            adjustment: "raw",
+            feed: cfg.alpaca.feed,
+          });
+          if (pageToken) params.set("page_token", pageToken);
+          const d = await aget(`${DATA}/v2/stocks/bars?${params}`, cfg);
+          for (const [sym, bars] of Object.entries(d.bars || {})) {
+            const mapped = bars.map((b) => ({ t: Date.parse(b.t), o: b.o, h: b.h, l: b.l, c: b.c, v: b.v }));
+            out.set(sym, (out.get(sym) || []).concat(mapped));
+          }
+          pageToken = d.next_page_token || null;
+        } while (pageToken);
+      }
+      return out;
+    },
   };
 }

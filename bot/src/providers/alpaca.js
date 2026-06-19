@@ -88,5 +88,17 @@ export function alpacaProvider() {
       }
       return out;
     },
+    // All active, tradable US equity symbols (the real gapper universe lives in
+    // small-caps, not a hand-picked large-cap list). Free endpoint.
+    async getAssets(cfg) {
+      const res = await fetch("https://api.alpaca.markets/v2/assets?status=active&asset_class=us_equity", {
+        headers: headers(cfg),
+      });
+      if (!res.ok) throw new Error(`Alpaca assets ${res.status}`);
+      const arr = await res.json();
+      return arr
+        .filter((a) => a.tradable && /^[A-Z]+$/.test(a.symbol)) // common shares only
+        .map((a) => a.symbol);
+    },
   };
 }

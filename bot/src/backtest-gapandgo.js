@@ -1,13 +1,14 @@
-// Gap-and-go FAIR TEST. Instead of a fixed symbol list, this finds each day's
-// ACTUAL top gappers across a broad universe (from daily bars), then trades the
+// Gap-and-go FAIR TEST. Finds each day's ACTUAL top gappers, then trades the
 // gap-and-go strategy on them. Reports in-sample vs out-of-sample.
 //
-//   npm run backtest:gap
+//   npm run backtest:gap                         # curated ~120-name universe
+//   GAP_FULL=1 npm run backtest:gap              # the WHOLE market (real gappers)
+//   GAP_FULL=1 GAP_DAYS=120 npm run backtest:gap # more history = more trades
+//   GAP_SLIPPAGE_BPS=30 GAP_FULL=1 npm run ...    # stress-test costs
 //
-// Honest caveats baked into the output: the universe is a broad proxy (not
-// literally every ticker), entries are the opening-range break AFTER 9:30 (the
-// testable version — pure premarket entries are a worse game), and real
-// premarket spreads are wider than the 5bps modeled, so shade results DOWN.
+// Honesty baked in: with the full universe the gappers are mostly small-caps,
+// whose spreads are far wider than large-caps — so slippage DEFAULTS to 20bps in
+// full mode (vs 5). Raise it further to see how fragile any edge is.
 
 import { DateTime } from "luxon";
 import { config, validateConfig } from "./config.js";
@@ -37,19 +38,38 @@ async function main() {
     console.error("The gap fair-test needs the Alpaca provider (set DATA_PROVIDER=alpaca).");
     process.exit(1);
   }
+
+  const useFull = process.env.GAP_FULL === "1";
+  const days = Number(process.env.GAP_DAYS) || config.backtestDays;
+  // Small-cap gappers slip far more than large-caps; default full mode to 20bps.
+  const defaultSlip = useFull ? 20 : config.strategies.slippageBps;
+  const slipBps = process.env.GAP_SLIPPAGE_BPS != null ? Number(process.env.GAP_SLIPPAGE_BPS) : defaultSlip;
+
+  let universe = DAYTRADE_UNIVERSE;
+  if (useFull) {
+    if (!provider.getAssets) {
+      console.error("Full universe needs the Alpaca provider.");
+      process.exit(1);
+    }
+    console.log("Fetching the full tradable US equity universe…");
+    universe = await provider.getAssets(config);
+    const cap = Number(process.env.GAP_MAX_SYMBOLS) || 0;
+    if (cap > 0) universe = universe.slice(0, cap);
+  }
+
   const tz = config.session.timezone;
   const now = DateTime.now().setZone(tz);
-  const fromMs = now.minus({ days: Math.ceil(config.backtestDays * 1.5) }).toMillis();
+  const fromMs = now.minus({ days: Math.ceil(days * 1.5) }).toMillis();
   const toMs = now.toMillis();
   const dateOf = (t) => DateTime.fromMillis(t, { zone: tz }).toISODate();
 
   console.log(
-    `Gap-and-go fair test [${provider.name}/${config.alpaca.feed}] · universe ${DAYTRADE_UNIVERSE.length} · ~${config.backtestDays} days\n` +
-      `gap≥${(config.strategies.gapMin * 100).toFixed(0)}% · top ${config.gapTopK}/day · slippage=${config.strategies.slippageBps}bps/side\n`,
+    `Gap-and-go fair test [${provider.name}/${config.alpaca.feed}] · universe ${universe.length} · ~${days} days\n` +
+      `gap≥${(config.strategies.gapMin * 100).toFixed(0)}% · top ${config.gapTopK}/day · slippage=${slipBps}bps/side\n`,
   );
 
-  console.log("Fetching daily bars to find gappers…");
-  const daily = await provider.getDailyBars(config, DAYTRADE_UNIVERSE, fromMs, toMs);
+  console.log("Fetching daily bars to find gappers… (full universe can take a few minutes)");
+  const daily = await provider.getDailyBars(config, universe, fromMs, toMs);
   const byDay = topByDay(gapRows(daily), config, dateOf);
   const dates = [...byDay.keys()].sort();
   const totalGappers = [...byDay.values()].reduce((s, l) => s + l.length, 0);
@@ -73,11 +93,11 @@ async function main() {
       if (!hit) continue;
       const next = session.reg[hit.idx + 1];
       if (!next) continue;
-      const entry = next.o * (1 + config.strategies.slippageBps / 10000);
+      const entry = next.o * (1 + slipBps / 10000);
       const r = evaluateTrade(
         { entry, stop: hit.setup.stop, target: hit.setup.target },
         session.reg.slice(hit.idx + 1),
-        { maxHoldBars: config.strategies.maxHoldBars, slippageBps: config.strategies.slippageBps },
+        { maxHoldBars: config.strategies.maxHoldBars, slippageBps: slipBps },
       );
       trades.push({ date, symbol: g.symbol, gapPct: g.gapPct, ...r });
     }
@@ -88,11 +108,16 @@ async function main() {
   console.log("                IN-SAMPLE  trades win  expR   PF   |  OUT-OF-SAMPLE trades win  expR   PF");
   console.log("-".repeat(92));
   console.log(`Gap-and-go      ${fmt(is)}  | ${fmt(oos)}`);
-  console.log(
-    "\nVerdict rule: only the OUT-OF-SAMPLE (right) column counts, and only if expR\n" +
-      "is clearly POSITIVE with enough trades. If it's negative or thin, gap-and-go\n" +
-      "fails its fair test too — and that's the answer: stop. Not advice.",
-  );
+
+  // Sample-size honesty: a positive expR on a handful of trades is meaningless.
+  const verdict =
+    oos.trades < 30
+      ? `\n⚠ ONLY ${oos.trades} out-of-sample trades — NOT enough to conclude anything (need ~30+,\n  ideally 100+). Re-run with GAP_FULL=1 and a larger GAP_DAYS to grow the sample.`
+      : oos.expectancyR > 0.05
+        ? `\n${oos.trades} OOS trades, expR ${oos.expectancyR.toFixed(2)}. Encouraging at this slippage —\n  now stress it: bump GAP_SLIPPAGE_BPS up. If the edge survives realistic costs\n  AND a parameter sweep, THEN paper-trade. Still not proof, still not advice.`
+        : `\n${oos.trades} OOS trades, expR ${oos.expectancyR.toFixed(2)} — not positive after costs. Verdict: stop.`;
+  console.log(verdict);
+  console.log("Reminder: only the OUT-OF-SAMPLE column counts, and a backtest still gets the\nbest fills. Shade it down. Not advice.");
 }
 
 main();

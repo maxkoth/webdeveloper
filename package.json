@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "build:cache": "tsx scripts/build-cache.ts",
-    "test": "node --import tsx --test src/lib/research/edgar.test.ts src/lib/research/score.test.ts"
+    "test": "node --import tsx --test src/lib/research/edgar.test.ts src/lib/research/score.test.ts src/lib/research/cache.test.ts"
   },
   "dependencies": {
     "next": "16.2.7",

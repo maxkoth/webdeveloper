@@ -15,10 +15,26 @@ export type CacheEntry = {
   sector: string;
   price: number | null;
   priceAsOf: string | null;
+  /** SEC Standard Industrial Classification code + description (for filtering
+   *  out company types a free-cash-flow DCF can't value). */
+  sic?: string;
+  sicDescription?: string;
   fundamentals: Fundamentals;
 };
 
 export type FundamentalsCache = { asOf: string; count: number; entries: CacheEntry[] };
+
+/** True for businesses a free-cash-flow DCF should NOT be applied to — the model
+ *  produces fake "bargains" for these, so they're excluded from the screen:
+ *   • SIC 6000–6799: banks, brokers, insurers, real estate / REITs, holding &
+ *     investment companies (their cash flows aren't "free cash flow").
+ *   • MLPs / limited partnerships (different accounting entirely). */
+export function isModelInvalid(entry: { sic?: string; name?: string }): boolean {
+  const n = Number(entry.sic);
+  if (Number.isFinite(n) && n >= 6000 && n <= 6799) return true;
+  if (/\bL\.?P\.?\b|\bPARTNERS\b/i.test(entry.name || "")) return true;
+  return false;
+}
 
 export const CACHE_PATH = path.join(process.cwd(), "data", "fundamentals.json");
 

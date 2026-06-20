@@ -2,7 +2,7 @@ import { UNIVERSE, quoteSymbolFor } from "@/lib/research/universe";
 import { computeFundamentals, type CompanyFacts, type Fundamentals } from "@/lib/research/edgar";
 import { scoreStock, type Scored } from "@/lib/research/score";
 import { quoteFor } from "@/lib/research/price";
-import { readCache, type CacheEntry } from "@/lib/research/cache";
+import { readCache, isModelInvalid, type CacheEntry } from "@/lib/research/cache";
 
 // Live screener. At request time it: (1) resolves tickers → CIK from SEC's map,
 // (2) pulls each company's `companyfacts`, (3) extracts fundamentals, (4) fetches
@@ -169,9 +169,12 @@ export async function GET(req: Request) {
     const minCap = Number(params.get("minCap")) || 0;
     const maxCap = Number(params.get("maxCap")) || Infinity;
     const qualityOnly = params.get("quality") === "1";
+    // Exclude banks/insurers/REITs/MLPs/preferreds the DCF can't value (default).
+    const includeAll = params.get("includeAll") === "1";
 
     const rows = cache.entries
       .filter((e) => {
+        if (!includeAll && isModelInvalid(e)) return false;
         if (e.price != null && e.price > maxPrice) return false;
         const shares = e.fundamentals?.dilutedShares;
         if (shares && e.price != null) {

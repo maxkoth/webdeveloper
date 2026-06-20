@@ -69,6 +69,32 @@ async function companyFacts(cik: string): Promise<CompanyFacts> {
   return data;
 }
 
+/** SEC industry classification (SIC) for a CIK, to exclude company types a
+ *  free-cash-flow DCF can't value. Uses a small Range request — sic sits at the
+ *  top of the submissions JSON — so we don't pull the whole filing history.
+ *  Cached on disk for 7 days. */
+async function companySic(cik: string): Promise<{ sic: string; sicDescription: string }> {
+  const file = path.join(FILINGS_DIR, `SIC${cik}.json`);
+  try {
+    const st = await fs.stat(file);
+    if (Date.now() - st.mtimeMs < 7 * 864e5) return JSON.parse(await fs.readFile(file, "utf8"));
+  } catch {
+    /* not cached yet */
+  }
+  const res = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, {
+    headers: { ...SEC_HEADERS, Range: "bytes=0-3000" },
+  });
+  const text = await res.text();
+  const slim = {
+    sic: text.match(/"sic"\s*:\s*"?(\d+)"?/)?.[1] ?? "",
+    sicDescription: text.match(/"sicDescription"\s*:\s*"([^"]*)"/)?.[1] ?? "",
+  };
+  await fs.mkdir(FILINGS_DIR, { recursive: true });
+  await fs.writeFile(file, JSON.stringify(slim));
+  await sleep(DELAY);
+  return slim;
+}
+
 type Snap = { latestTrade?: { p?: number }; dailyBar?: { c?: number; t?: string }; prevDailyBar?: { c?: number } };
 
 /** Bulk daily prices from Alpaca (100 symbols/call). Daily close is all a
@@ -101,13 +127,19 @@ async function main() {
   console.log("Fetching SEC ticker map…");
   const map = await getJson<TickerMap>(TICKER_MAP_URL, SEC_HEADERS);
 
-  const seen = new Set<string>();
-  let list = Object.values(map)
-    .filter((r) => r?.ticker && /^[A-Z]+$/.test(r.ticker)) // common shares only (skip units/warrants/dots)
-    .map((r) => ({ ticker: r.ticker.toUpperCase(), name: r.title, cik: String(r.cik_str).padStart(10, "0") }))
-    .filter((r) => (seen.has(r.ticker) ? false : (seen.add(r.ticker), true)));
+  // De-dupe by CIK keeping the SHORTEST ticker, which drops preferred shares and
+  // duplicate share classes (e.g. ZIONP under ZION, GOOG under GOOGL) — those
+  // share a company's filings but trade at a different price, creating junk.
+  const byCik = new Map<string, { ticker: string; name: string; cik: string }>();
+  for (const r of Object.values(map)) {
+    if (!r?.ticker || !/^[A-Z]+$/.test(r.ticker)) continue; // common shares only
+    const row = { ticker: r.ticker.toUpperCase(), name: r.title, cik: String(r.cik_str).padStart(10, "0") };
+    const ex = byCik.get(row.cik);
+    if (!ex || row.ticker.length < ex.ticker.length) byCik.set(row.cik, row);
+  }
+  let list = [...byCik.values()];
   if (CACHE_MAX > 0) list = list.slice(0, CACHE_MAX);
-  console.log(`Universe: ${list.length} tickers (CACHE_MAX=${CACHE_MAX || "all"})`);
+  console.log(`Universe: ${list.length} companies (CACHE_MAX=${CACHE_MAX || "all"})`);
 
   // 1) Fundamentals from SEC (the slow part).
   const partial: Omit<CacheEntry, "price" | "priceAsOf">[] = [];
@@ -118,10 +150,19 @@ async function main() {
     done++;
     try {
       const facts = await companyFacts(c.cik);
+      let sic = "",
+        sicDescription = "";
+      try {
+        ({ sic, sicDescription } = await companySic(c.cik));
+      } catch {
+        /* sic is best-effort */
+      }
       partial.push({
         ticker: c.ticker,
         name: c.name,
         sector: sectorOf.get(c.ticker) ?? "Unknown",
+        sic,
+        sicDescription,
         fundamentals: computeFundamentals(facts),
       });
       ok++;

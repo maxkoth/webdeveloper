@@ -100,12 +100,28 @@ export function scoreStock(f: Fundamentals, price: number | null): Scored {
   }
 
   const v = valuation(a);
+
+  // Data-quality guards. Whole-market small-cap filings produce two kinds of
+  // fake bargains that otherwise rank at the very top:
+  //   1. Non-positive intrinsic value — the owner-earnings DCF doesn't even
+  //      cover net debt. Dividing the margin of safety by a negative intrinsic
+  //      yields a bogus large positive %. We can't honestly value these.
+  //   2. Implausible discounts (>90% "undervalued") — almost always a bad share
+  //      count or a wrong price (e.g. 185k shares for a $240M-revenue company).
+  // Both get marked "n/a" so they sort to the bottom instead of the top.
+  if (!(v.intrinsicLow > 0)) {
+    return { ...base, assumptions: a, valuation: v, fairPrice: null, bargainPrice: null, marginOfSafety: null, status: "n/a" };
+  }
+
   const fairPrice = v.intrinsicLow;
   const bargainPrice = v.intrinsicLow * MOS_DISCOUNT; // == v.buyBelow
   let mos: number | null = null;
   let status: Scored["status"] = "n/a";
   if (price != null && price > 0) {
     mos = (v.intrinsicLow - price) / v.intrinsicLow;
+    if (mos > 0.9) {
+      return { ...base, assumptions: a, valuation: v, fairPrice, bargainPrice, marginOfSafety: null, status: "n/a" };
+    }
     status = price <= bargainPrice ? "bargain" : price <= fairPrice ? "fair" : "rich";
   }
 

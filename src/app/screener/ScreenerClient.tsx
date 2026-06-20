@@ -39,26 +39,33 @@ export default function ScreenerClient() {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [lens, setLens] = useState<Lens>("fair");
   const [open, setOpen] = useState<string | null>(null);
+  // Size / quality filters, applied server-side via /api/screen query params.
+  const [maxPrice, setMaxPrice] = useState("");
+  const [smallCap, setSmallCap] = useState(false);
+  const [qualityOnly, setQualityOnly] = useState(false);
 
-  // Async setState only (inside .then/.catch) — safe to call from the effect.
   const run = useCallback(() => {
-    fetch("/api/screen", { cache: "no-store" })
+    setState("loading");
+    const p = new URLSearchParams({ limit: "300" });
+    if (maxPrice && Number(maxPrice) > 0) p.set("maxPrice", maxPrice);
+    if (smallCap) p.set("maxCap", "2000000000");
+    if (qualityOnly) p.set("quality", "1");
+    fetch(`/api/screen?${p.toString()}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((d: ScreenResponse) => {
         setData(d);
         setState(d.error ? "error" : "ready");
       })
       .catch(() => setState("error"));
-  }, []);
+  }, [maxPrice, smallCap, qualityOnly]);
 
+  // Run once on mount; after that the user re-runs via the Apply button.
   useEffect(() => {
     run();
-  }, [run]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const retry = () => {
-    setState("loading");
-    run();
-  };
+  const retry = () => run();
 
   const rows = useMemo(() => {
     const all = data?.rows ?? [];
@@ -134,6 +141,34 @@ export default function ScreenerClient() {
           {counts.pass} pass · {counts.reject} rejected · {counts.insufficient} no data ·{" "}
           <span className="text-volt">{counts.inZone} in buy zone</span>
         </p>
+      </div>
+
+      {/* Size / quality filters */}
+      <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-line p-3">
+        <label className="flex items-center gap-2 text-sm text-muted">
+          Max price $
+          <input
+            type="number"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="any"
+            className="w-20 rounded border border-line bg-ink px-2 py-1 font-mono text-paper"
+          />
+        </label>
+        <label className="flex items-center gap-2 text-sm text-muted">
+          <input type="checkbox" checked={smallCap} onChange={(e) => setSmallCap(e.target.checked)} />
+          Small-cap only (≤ $2B)
+        </label>
+        <label className="flex items-center gap-2 text-sm text-muted">
+          <input type="checkbox" checked={qualityOnly} onChange={(e) => setQualityOnly(e.target.checked)} />
+          Quality only (passes screen)
+        </label>
+        <button
+          onClick={run}
+          className="rounded-full bg-volt px-4 py-1.5 font-semibold text-ink transition-transform hover:-translate-y-0.5"
+        >
+          Apply
+        </button>
       </div>
       <p className="mt-3 text-sm text-muted">
         {lens === "fair" ? (

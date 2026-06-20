@@ -51,6 +51,13 @@ export const config = {
     statuses: ["bargain"], // "bargain" = at/below buy-below line. Add "fair" to widen.
     cooldownHours: 24 * 7, // don't re-text the same name within a week
     maxPerRun: 20,
+    // Your wish-list (VALUE_WATCHLIST=AAPL,COST,V). When set, the alerter ONLY
+    // watches these names and texts the moment one hits its buy-below price.
+    // When empty, it discovers bargains across the whole screened universe.
+    watchlist: (process.env.VALUE_WATCHLIST || "")
+      .split(",")
+      .map((s) => s.trim().toUpperCase())
+      .filter(Boolean),
   },
 
   // Stage 2 — signal thresholds + risk model.

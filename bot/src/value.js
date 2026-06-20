@@ -22,11 +22,20 @@ export async function getValueBargains(cfg) {
   const data = await res.json();
   if (data.error) throw new Error(data.error);
 
+  const watch = cfg.value.watchlist || [];
   const out = [];
   for (const r of data.rows || []) {
     const s = r.scored;
-    if (!s || s.verdict !== "pass") continue; // quality gate
-    if (!cfg.value.statuses.includes(s.status)) continue; // price gate (default: "bargain")
+    if (!s) continue;
+    if (watch.length) {
+      // Watchlist mode: only YOUR names; alert when one hits its buy-below price.
+      if (!watch.includes(r.ticker)) continue;
+      if (s.status !== "bargain") continue;
+    } else {
+      // Discovery mode: quality businesses trading at/below their buy price.
+      if (s.verdict !== "pass") continue;
+      if (!cfg.value.statuses.includes(s.status)) continue;
+    }
     out.push({
       symbol: r.ticker,
       type: "value", // for de-dup keying

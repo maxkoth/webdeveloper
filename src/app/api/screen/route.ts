@@ -159,9 +159,29 @@ export async function GET(req: Request) {
   // flooded with thousands of rows.
   const cache = await readCache();
   if (cache) {
-    const limit = Math.min(Number(new URL(req.url).searchParams.get("limit")) || 300, 3000);
+    const params = new URL(req.url).searchParams;
+    const limit = Math.min(Number(params.get("limit")) || 300, 3000);
+    // Optional size filters so you can browse smaller, lesser-known names:
+    //   ?maxPrice=20            share price ceiling
+    //   ?maxCap=2e9&minCap=1e8  market-cap band (price × diluted shares), in $
+    //   ?quality=1              only names that PASS the quality screen
+    const maxPrice = Number(params.get("maxPrice")) || Infinity;
+    const minCap = Number(params.get("minCap")) || 0;
+    const maxCap = Number(params.get("maxCap")) || Infinity;
+    const qualityOnly = params.get("quality") === "1";
+
     const rows = cache.entries
+      .filter((e) => {
+        if (e.price != null && e.price > maxPrice) return false;
+        const shares = e.fundamentals?.dilutedShares;
+        if (shares && e.price != null) {
+          const cap = e.price * shares;
+          if (cap < minCap || cap > maxCap) return false;
+        }
+        return true;
+      })
       .map(rowFromCache)
+      .filter((r) => !qualityOnly || r.scored?.verdict === "pass")
       .sort(
         (a, b) =>
           (b.scored?.marginOfSafety ?? -Infinity) - (a.scored?.marginOfSafety ?? -Infinity),

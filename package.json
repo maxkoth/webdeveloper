@@ -9,9 +9,12 @@
     "lint": "eslint",
     "scan:test": "tsx scripts/selftest.ts",
     "backtest": "tsx scripts/backtest.ts",
-    "alerts": "tsx scripts/run-alerts.ts"
+    "alerts": "tsx scripts/run-alerts.ts",
+    "autopilot": "tsx scripts/autopilot.ts",
+    "autopilot:test": "tsx scripts/autopilot-test.ts"
   },
   "dependencies": {
+    "@stoqey/ib": "^1.6.0",
     "next": "16.2.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"

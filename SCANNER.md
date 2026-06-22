@@ -62,8 +62,9 @@ Weighted blend, each dimension explainable in the UI:
 ## Backtest
 
 ```bash
-npm run backtest                         # default basket, 5-day hold, top 3
-npm run backtest AAPL,NVDA,MRVL,AMD --horizon 10 --top 2 --min 65
+npm run backtest                              # default basket, 5-day hold, top 3
+# Pass args after `--` so npm forwards them to the script (not to npm itself):
+npm run backtest -- AAPL,NVDA,MRVL,AMD --horizon 10 --top 2 --min 65
 ```
 
 Replays the scanner day by day with **no lookahead**, "buys" the top-N scorers

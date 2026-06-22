@@ -6,8 +6,15 @@
 import { scoreSetup } from "./score";
 import { fetchUniverse } from "./tradingview";
 import { fetchSeriesBatch } from "./yahoo";
+import { fetchNewsBatch, finnhubEnabled } from "./finnhub";
 import { SAMPLE_UNIVERSE, sampleSeries } from "./sample";
-import type { PriceSeries, RawQuote, ScanResult, Setup } from "./types";
+import type {
+  NewsSignal,
+  PriceSeries,
+  RawQuote,
+  ScanResult,
+  Setup,
+} from "./types";
 
 /** How many of the top-ranked names get enriched with Yahoo history. */
 const ENRICH_TOP = 12;
@@ -53,22 +60,31 @@ export async function runScan(opts: ScanOptions = {}): Promise<ScanResult> {
 
   const enrichSymbols = provisional.slice(0, ENRICH_TOP).map((s) => s.symbol);
 
-  // 3. Enrich the leaders with real price history (support/resistance, spark).
+  // 3. Enrich the leaders with real price history (support/resistance, spark)
+  //    and, when a Finnhub key is set, real news sentiment. Both run in
+  //    parallel and either can fail without sinking the scan.
   let seriesMap = new Map<string, PriceSeries>();
-  try {
-    seriesMap = await fetchSeriesBatch(enrichSymbols);
-    if (seriesMap.size === 0) {
-      warnings.push("Price history unavailable; scores use snapshot data only.");
-    }
-  } catch (err) {
-    warnings.push(`Price history unavailable (${errMsg(err)}).`);
+  let newsMap = new Map<string, NewsSignal>();
+  const [seriesRes, newsRes] = await Promise.allSettled([
+    fetchSeriesBatch(enrichSymbols),
+    finnhubEnabled() ? fetchNewsBatch(enrichSymbols) : Promise.resolve(newsMap),
+  ]);
+  if (seriesRes.status === "fulfilled") seriesMap = seriesRes.value;
+  else warnings.push(`Price history unavailable (${errMsg(seriesRes.reason)}).`);
+  if (seriesMap.size === 0) {
+    warnings.push("Price history unavailable; scores use snapshot data only.");
+  }
+  if (newsRes.status === "fulfilled") newsMap = newsRes.value;
+  else warnings.push(`News sentiment unavailable (${errMsg(newsRes.reason)}).`);
+  if (!finnhubEnabled()) {
+    warnings.push("No FINNHUB_API_KEY set — catalyst uses the gap+volume proxy.");
   }
 
-  // 4. Final score, now with history where we have it.
+  // 4. Final score, now with history and news where we have them.
   const bySymbol = new Map(universe.map((q) => [q.symbol, q]));
   const setups: Setup[] = [];
   for (const q of bySymbol.values()) {
-    setups.push(scoreSetup(q, seriesMap.get(q.symbol)));
+    setups.push(scoreSetup(q, seriesMap.get(q.symbol), newsMap.get(q.symbol)));
   }
   setups.sort((a, b) => b.score - a.score);
 

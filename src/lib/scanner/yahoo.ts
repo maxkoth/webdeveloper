@@ -27,9 +27,12 @@ type YahooResponse = {
  * Fetch ~3 months of daily bars for one symbol. Returns null on any failure
  * so a single bad ticker never sinks the whole scan.
  */
-export async function fetchSeries(symbol: string): Promise<PriceSeries | null> {
+export async function fetchSeries(
+  symbol: string,
+  range = "3mo",
+): Promise<PriceSeries | null> {
   try {
-    const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=3mo&interval=1d`;
+    const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
     const res = await fetch(url, {
       headers: {
         "User-Agent":
@@ -46,6 +49,7 @@ export async function fetchSeries(symbol: string): Promise<PriceSeries | null> {
 
     // Yahoo pads gaps with nulls; drop any bar that's missing a field so the
     // arrays stay aligned and the indicators never see a hole.
+    const opens: number[] = [];
     const closes: number[] = [];
     const highs: number[] = [];
     const lows: number[] = [];
@@ -55,8 +59,10 @@ export async function fetchSeries(symbol: string): Promise<PriceSeries | null> {
       const c = quote.close[i];
       const h = quote.high?.[i];
       const l = quote.low?.[i];
+      const o = quote.open?.[i];
       const v = quote.volume?.[i];
       if (c == null || h == null || l == null) continue;
+      opens.push(o ?? c);
       closes.push(c);
       highs.push(h);
       lows.push(l);
@@ -64,7 +70,7 @@ export async function fetchSeries(symbol: string): Promise<PriceSeries | null> {
     }
     if (closes.length < 20) return null;
 
-    return { symbol, closes, highs, lows, volumes };
+    return { symbol, opens, closes, highs, lows, volumes };
   } catch {
     return null;
   }

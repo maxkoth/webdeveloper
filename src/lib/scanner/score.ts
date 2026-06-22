@@ -11,6 +11,7 @@ import { atr, clamp, levels, normalize, roc } from "./indicators";
 import type {
   Dimension,
   Levels,
+  NewsSignal,
   PriceSeries,
   RawQuote,
   Setup,
@@ -114,19 +115,31 @@ function scoreTechnical(q: RawQuote, lv: Levels | null): Dimension {
 }
 
 /**
- * Catalyst — an HONEST proxy, not real news sentiment. A meaningful overnight
- * gap combined with heavy relative volume is the statistical fingerprint of a
- * news-driven move (earnings, upgrade, contract). To wire in true headline
- * sentiment, drop a provider here (see fetchNewsSentiment hook) and replace
- * this block; the dimension and weighting already exist for it.
+ * Catalyst. When real news data is supplied (Finnhub), we score actual
+ * headline sentiment plus coverage volume. Without it we fall back to an
+ * HONEST proxy: a meaningful overnight gap on heavy relative volume is the
+ * statistical fingerprint of a news-driven move (earnings, upgrade, contract).
+ * The note makes clear which of the two is in play.
  */
-function scoreCatalyst(q: RawQuote): Dimension {
+function scoreCatalyst(q: RawQuote, news?: NewsSignal): Dimension {
+  if (news) {
+    // Bullish sentiment (0..1 from -1..1), weighted by how much coverage there
+    // is — one stray article shouldn't swing the score like a wall of them.
+    const lean = normalize(news.sentiment, -0.4, 0.6);
+    const coverage = normalize(news.articleCount, 1, 12);
+    const score = clamp(0.7 * lean + 0.3 * coverage, 0, 1);
+    const dir =
+      news.sentiment > 0.1 ? "bullish" : news.sentiment < -0.1 ? "bearish" : "mixed";
+    const note = `News ${dir} (${news.sentiment >= 0 ? "+" : ""}${news.sentiment.toFixed(2)}) across ${news.articleCount} articles`;
+    return { key: "catalyst", label: "Catalyst", score, weight: WEIGHTS.catalyst, note };
+  }
+
   const gapMag = normalize(Math.abs(q.gapPct), 1, 8);
   const volConfirm = normalize(q.relVolume, 1.5, 4);
   const score = clamp(0.6 * gapMag + 0.4 * volConfirm, 0, 1);
   const note =
     Math.abs(q.gapPct) >= 2
-      ? `Gapped ${q.gapPct > 0 ? "+" : ""}${q.gapPct.toFixed(1)}% on heavy volume — likely catalyst`
+      ? `Gapped ${q.gapPct > 0 ? "+" : ""}${q.gapPct.toFixed(1)}% on heavy volume — likely catalyst (proxy)`
       : `No major gap — catalyst signal weak (proxy)`;
   return { key: "catalyst", label: "Catalyst", score, weight: WEIGHTS.catalyst, note };
 }
@@ -165,15 +178,22 @@ function buildPlan(q: RawQuote, lv: Levels | null, series?: PriceSeries) {
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
-/** Score one name end to end. `series` is optional (Yahoo may be unreachable). */
-export function scoreSetup(q: RawQuote, series?: PriceSeries): Setup {
+/**
+ * Score one name end to end. `series` (Yahoo history) and `news` (Finnhub
+ * sentiment) are both optional — the engine degrades cleanly without either.
+ */
+export function scoreSetup(
+  q: RawQuote,
+  series?: PriceSeries,
+  news?: NewsSignal,
+): Setup {
   const lv = series ? levels(series) : null;
   const dims: Dimension[] = [
     scoreMomentum(q, series),
     scoreTrend(q),
     scoreParticipation(q),
     scoreTechnical(q, lv),
-    scoreCatalyst(q),
+    scoreCatalyst(q, news),
   ];
 
   const weighted = dims.reduce((sum, d) => sum + d.score * d.weight, 0);
@@ -199,5 +219,6 @@ export function scoreSetup(q: RawQuote, series?: PriceSeries): Setup {
     },
     plan: buildPlan(q, lv, series),
     spark,
+    headline: news?.topHeadline,
   };
 }

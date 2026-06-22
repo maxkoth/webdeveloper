@@ -39,10 +39,25 @@ export type RawQuote = {
 /** Daily OHLC series for one symbol (from Yahoo), oldest -> newest. */
 export type PriceSeries = {
   symbol: string;
+  /** Opens, when available — needed to reconstruct gaps for the backtest. */
+  opens?: number[];
   closes: number[];
   highs: number[];
   lows: number[];
   volumes: number[];
+};
+
+/**
+ * Real news signal for a symbol (from Finnhub). When present it replaces the
+ * gap+volume catalyst proxy with actual headline sentiment.
+ */
+export type NewsSignal = {
+  /** Aggregate sentiment, -1 (bearish) .. 1 (bullish). */
+  sentiment: number;
+  /** How many articles in the lookback window — a buzz/coverage proxy. */
+  articleCount: number;
+  /** Most recent headline, surfaced in the UI. */
+  topHeadline?: string;
 };
 
 /** Support / resistance derived from recent price structure. */
@@ -94,6 +109,8 @@ export type Setup = {
   };
   /** Last 30 closes for the sparkline. */
   spark: number[];
+  /** Most recent headline when real news data was available. */
+  headline?: string;
 };
 
 export type ScanResult = {

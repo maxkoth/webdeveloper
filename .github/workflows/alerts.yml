@@ -1,0 +1,66 @@
+# Scheduled stock-setup alerts — runs the scanner and texts you via Twilio.
+# No server needed: GitHub's runner has open network, so this works even when
+# the app isn't deployed.
+#
+# Setup: add these repo secrets (Settings → Secrets and variables → Actions):
+#   FINNHUB_API_KEY   (optional, enables real news sentiment)
+#   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM, ALERT_TO
+# Optional repo variables: ALERT_SCORE (default 80).
+#
+# Times are UTC. The crons below target US market hours (≈9:30–16:00 ET).
+# Adjust by ~1h across DST if you care about the exact open.
+
+name: Setup Alerts
+
+on:
+  schedule:
+    # Daily digest once, ~10:00 ET (14:00 UTC), weekdays.
+    - cron: "0 14 * * 1-5"
+    # Intraday threshold checks every 30 min during the session.
+    - cron: "0,30 14-20 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "digest or threshold"
+        default: "digest"
+
+concurrency:
+  group: setup-alerts
+  cancel-in-progress: false
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - run: npm ci
+
+      # Pick the mode from the trigger: the 14:00 daily cron sends a digest;
+      # every other scheduled run does an intraday threshold check.
+      - name: Decide mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ github.event.inputs.mode }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 14 * * 1-5" ]; then
+            echo "mode=digest" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=threshold" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run alerts
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+          ALERT_SCORE: ${{ vars.ALERT_SCORE }}
+          MARKET_HOURS_ONLY: "1"
+        run: npm run alerts -- ${{ steps.mode.outputs.mode }}

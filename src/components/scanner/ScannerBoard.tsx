@@ -246,6 +246,12 @@ function Breakdown({ setup }: { setup: Setup }) {
             <Row label="Target (ref)" value={`$${setup.plan.target.toFixed(2)}`} />
             <Row label="Reward : risk" value={`${setup.plan.rMultiple.toFixed(1)}R`} />
           </dl>
+          {setup.headline && (
+            <p className="mt-3 text-xs leading-relaxed text-paper/80">
+              <span className="label mr-1 align-middle">News</span>
+              {setup.headline}
+            </p>
+          )}
           <p className="mt-3 text-[0.7rem] leading-relaxed text-muted">
             Reference levels derived from price structure &amp; ATR. Educational
             screening only — not a recommendation or financial advice.

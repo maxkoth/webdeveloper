@@ -40,13 +40,13 @@ export default function HowIWork() {
           />
         </div>
 
-        <ol className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((step, i) => (
             <Reveal
               key={step.n}
               as="li"
               delay={i * 70}
-              className="flex flex-col bg-ink-raised p-7 sm:p-8"
+              className="group/card surface flex flex-col rounded-2xl border border-line p-7 transition-colors hover:border-volt/40 sm:p-8"
             >
               <span className="font-mono text-sm text-volt">{step.n}</span>
               <h3 className="display mt-6 text-2xl text-paper">{step.title}</h3>

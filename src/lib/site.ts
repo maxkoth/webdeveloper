@@ -26,6 +26,13 @@ export const CONTACT = {
   },
 } as const;
 
+// Honest, verifiable facts — no fabricated stats or tenure.
+export const HERO_META = [
+  "Based in New York",
+  "iOS · React Native · Web",
+  "AI built on Claude",
+] as const;
+
 export const NAV_LINKS = [
   { href: "#what-i-build", label: "What I build" },
   { href: "#work", label: "Work" },

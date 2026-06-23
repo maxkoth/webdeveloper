@@ -71,6 +71,75 @@
     color: var(--color-muted);
   }
 
+  /*
+    Raised surface (cards): a faint top highlight + inner hairline reads as a
+    panel catching light, not a flat fill. Hover lifts it toward the accent.
+  */
+  .surface {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(245, 243, 236, 0.04), transparent 38%),
+      var(--color-ink-raised);
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.35s ease,
+      background-color 0.35s ease;
+  }
+  .surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(245, 243, 236, 0.14), transparent 50%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .group\/card:hover .surface,
+  .surface:hover {
+    box-shadow:
+      0 1px 0 0 rgba(198, 241, 53, 0.25) inset,
+      0 24px 60px -24px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Animated, accent underline for nav links (no layout shift). */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 2px;
+    width: 100%;
+    background: var(--color-volt);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-link:hover::after,
+  .nav-link[data-active="true"]::after {
+    transform: scaleX(1);
+  }
+
+  /* Soft volt glow on the primary CTA. */
+  .glow-volt {
+    box-shadow: 0 0 0 0 rgba(198, 241, 53, 0);
+    transition:
+      box-shadow 0.3s ease,
+      transform 0.2s ease;
+  }
+  .glow-volt:hover {
+    box-shadow: 0 10px 40px -12px rgba(198, 241, 53, 0.55);
+  }
+
   /* Entrance motion driven by IntersectionObserver (see Reveal.tsx). */
   .reveal {
     opacity: 0;
@@ -84,6 +153,36 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/*
+  Film-grain overlay — a faint, fixed noise layer over the whole page. Gives the
+  flat dark canvas a premium, printed texture instead of dead pixels. It's a
+  single inlined SVG (no network request) and pointer-events:none.
+*/
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Quiet scroll cue at the foot of the hero. */
+@keyframes cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+.scroll-cue {
+  animation: cue 2s ease-in-out infinite;
 }
 
 /* Respect users who don't want motion. */

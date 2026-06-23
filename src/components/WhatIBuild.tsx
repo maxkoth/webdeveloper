@@ -39,12 +39,12 @@ export default function WhatIBuild() {
           <SectionHeading index="01" label="What I build" title="Two things, done well." />
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-2">
+        <div className="mt-14 grid gap-4 md:grid-cols-2">
           {SERVICES.map((service, i) => (
             <Reveal
               key={service.title}
               delay={i * 80}
-              className="flex flex-col bg-ink-raised p-7 sm:p-10"
+              className="group/card surface flex flex-col rounded-2xl border border-line p-7 transition-colors hover:border-volt/40 sm:p-10"
             >
               <span className="label text-volt">{service.tag}</span>
               <h3 className="display mt-5 text-3xl text-paper sm:text-4xl">

@@ -43,7 +43,7 @@ Everything content-related lives in two places:
 - The section components in [`src/components/`](src/components) — `Hero`,
   `WhatIBuild`, `SelectedWork`, `HowIWork`, `About`, `Footer`.
 
-When real live URLs exist, replace the `[link coming soon]` markers in
+The two case studies and their live URLs (teamthrive.com, thevaultr.com) live in
 [`SelectedWork.tsx`](src/components/SelectedWork.tsx).
 
 ## Contact
@@ -74,7 +74,7 @@ states are visible, and motion is disabled under `prefers-reduced-motion`.
 
 | Category       | Mobile | Desktop |
 | -------------- | :----: | :-----: |
-| Performance    |   99   |   100   |
+| Performance    |   97   |   100   |
 | Accessibility  |  100   |   100   |
 | Best Practices |  100   |   100   |
 | SEO            |  100   |   100   |

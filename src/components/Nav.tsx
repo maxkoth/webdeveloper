@@ -6,12 +6,34 @@ import { CONTACT, NAV_LINKS, SITE } from "@/lib/site";
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string>("");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll-spy: highlight the nav link for the section currently in view.
+  useEffect(() => {
+    const ids = NAV_LINKS.map((l) => l.href.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActive(`#${visible.target.id}`);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.25, 0.5] },
+    );
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
   }, []);
 
   // Lock body scroll while the mobile menu is open.
@@ -54,7 +76,9 @@ export default function Nav() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="font-mono text-xs uppercase tracking-[0.16em] text-muted transition-colors hover:text-paper"
+                data-active={active === link.href}
+                aria-current={active === link.href ? "true" : undefined}
+                className="nav-link font-mono text-xs uppercase tracking-[0.16em] text-muted transition-colors hover:text-paper data-[active=true]:text-paper"
               >
                 {link.label}
               </a>

@@ -2,8 +2,8 @@ import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 
 // Exactly the two real projects supplied. No clients named, no extras invented.
-// Each card leads with what it does + the differentiator, then the stack.
-// Live URLs are marked [link coming soon] until real URLs are supplied.
+// Each card leads with what it does + the differentiator, then the stack,
+// then the live site (teamthrive.com / thevaultr.com).
 const WORK = [
   {
     kind: "AI · iOS",
@@ -14,6 +14,8 @@ const WORK = [
       "Turns raw video into coaching-grade feedback with no human in the loop.",
     stack: ["Claude API", "React Native", "Mux", "Supabase", "AWS"],
     cover: "motion" as const,
+    url: "https://teamthrive.com",
+    urlLabel: "teamthrive.com",
   },
   {
     kind: "AI · Mobile + Web",
@@ -24,6 +26,8 @@ const WORK = [
       "A recommendation engine, not just a price lookup. Other apps show value; none tell you what to do next.",
     stack: ["React Native", "Claude API", "Image scanning", "Landing page"],
     cover: "scan" as const,
+    url: "https://thevaultr.com",
+    urlLabel: "thevaultr.com",
   },
 ] as const;
 
@@ -35,13 +39,13 @@ export default function SelectedWork() {
           <SectionHeading index="02" label="Selected work" title="Things I shipped." />
         </div>
 
-        <div className="mt-14 flex flex-col gap-px overflow-hidden rounded-2xl border border-line bg-line">
+        <div className="mt-14 flex flex-col gap-4">
           {WORK.map((item, i) => (
             <Reveal
               key={item.title}
               delay={i * 80}
               as="article"
-              className="grid gap-8 bg-ink-raised p-7 sm:p-10 lg:grid-cols-[1.4fr_1fr] lg:items-center"
+              className="group/card surface grid gap-8 rounded-2xl border border-line p-7 transition-colors hover:border-volt/40 sm:p-10 lg:grid-cols-[1.4fr_1fr] lg:items-center"
             >
               <div>
                 <span className="label text-volt">{item.kind}</span>
@@ -69,7 +73,29 @@ export default function SelectedWork() {
                 </ul>
 
                 <p className="mt-6 font-mono text-xs text-muted">
-                  <span className="text-paper">Live:</span> [link coming soon]
+                  <span className="text-paper">Live:</span>{" "}
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/link inline-flex items-center gap-1 text-volt underline-offset-4 hover:underline"
+                  >
+                    {item.urlLabel}
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      className="transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+                    >
+                      <path d="M7 17 17 7M9 7h8v8" />
+                    </svg>
+                  </a>
                 </p>
               </div>
 
@@ -88,7 +114,7 @@ export default function SelectedWork() {
  */
 function Cover({ variant }: { variant: "motion" | "scan" }) {
   return (
-    <div className="order-first aspect-[5/4] w-full overflow-hidden rounded-xl border border-line bg-ink lg:order-none">
+    <div className="order-first aspect-[5/4] w-full overflow-hidden rounded-xl border border-line bg-gradient-to-br from-ink-raised to-ink transition-transform duration-500 group-hover/card:scale-[1.015] lg:order-none">
       {variant === "motion" ? <MotionArt /> : <ScanArt />}
     </div>
   );

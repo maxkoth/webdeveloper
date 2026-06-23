@@ -17,13 +17,14 @@ export default function ContactButtons({
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <a
         href={CONTACT.sms}
-        className={`group inline-flex items-center justify-center gap-2 rounded-full bg-volt font-semibold tracking-tight text-ink transition-transform duration-200 hover:-translate-y-0.5 ${pad}`}
+        className={`group glow-volt inline-flex items-center justify-center gap-2 rounded-full bg-volt font-semibold tracking-tight text-ink hover:-translate-y-0.5 ${pad}`}
       >
         <ChatIcon />
         Text me
         <span className="font-mono text-[0.8em] font-normal opacity-70">
           {CONTACT.phoneDisplay}
         </span>
+        <ArrowIcon />
       </a>
       <a
         href={CONTACT.mailto}
@@ -50,6 +51,25 @@ function ChatIcon() {
       aria-hidden="true"
     >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="-ml-0.5 w-0 -translate-x-1 opacity-0 transition-all duration-200 group-hover:w-4 group-hover:translate-x-0 group-hover:opacity-100"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }

@@ -75,7 +75,10 @@ export default function RootLayout({
       lang="en"
       className={`${archivo.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <div className="grain" aria-hidden="true" />
+        {children}
+      </body>
     </html>
   );
 }

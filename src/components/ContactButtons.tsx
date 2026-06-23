@@ -1,3 +1,6 @@
+"use client";
+
+import { track } from "@vercel/analytics";
 import { CONTACT } from "@/lib/site";
 
 /**
@@ -5,11 +8,15 @@ import { CONTACT } from "@/lib/site";
  * Both links are real, tappable, one-tap targets on mobile:
  *   Text  -> sms:+16464621236
  *   Email -> mailto:maxkoth77@gmail.com
+ * Each click fires a "lead" conversion event (method + placement) so we can
+ * measure what actually drives people to reach out.
  */
 export default function ContactButtons({
   size = "lg",
+  placement = "hero",
 }: {
   size?: "lg" | "md";
+  placement?: string;
 }) {
   const pad = size === "lg" ? "px-7 py-4 text-base" : "px-6 py-3 text-sm";
 
@@ -17,6 +24,7 @@ export default function ContactButtons({
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <a
         href={CONTACT.sms}
+        onClick={() => track("lead", { method: "text", placement })}
         className={`group glow-volt inline-flex items-center justify-center gap-2 rounded-full bg-volt font-semibold tracking-tight text-ink hover:-translate-y-0.5 ${pad}`}
       >
         <ChatIcon />
@@ -28,6 +36,7 @@ export default function ContactButtons({
       </a>
       <a
         href={CONTACT.mailto}
+        onClick={() => track("lead", { method: "email", placement })}
         className={`group inline-flex items-center justify-center gap-2 rounded-full border border-paper/30 font-semibold tracking-tight text-paper transition-colors duration-200 hover:border-volt hover:text-volt ${pad}`}
       >
         <MailIcon />

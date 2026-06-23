@@ -19,7 +19,7 @@ export default function Footer() {
           </p>
 
           <div className="mt-9">
-            <ContactButtons size="lg" />
+            <ContactButtons size="lg" placement="footer" />
           </div>
         </Reveal>
 

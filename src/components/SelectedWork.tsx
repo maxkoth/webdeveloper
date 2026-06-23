@@ -12,7 +12,7 @@ const WORK = [
       "I built an AI layer on top of an existing iOS app for athlete performance and recruiting. It analyzes uploaded athlete videos to detect movement, flag performance issues, and automatically generate written coaching feedback.",
     differentiator:
       "Turns raw video into coaching-grade feedback with no human in the loop.",
-    stack: ["Claude API", "React Native", "Mux", "Supabase", "AWS"],
+    stack: ["AI-powered", "React Native", "Mux", "Supabase", "AWS"],
     cover: "motion" as const,
     url: "https://teamthrive.com",
     urlLabel: "teamthrive.com",
@@ -24,7 +24,7 @@ const WORK = [
       "I built a mobile app that scans trading cards, identifies and values them, and — unlike every competitor — recommends what to do with each card: grade, sell, or hold. It's made for casual collectors, not hobby experts, and ships with its own marketing landing page.",
     differentiator:
       "A recommendation engine, not just a price lookup. Other apps show value; none tell you what to do next.",
-    stack: ["React Native", "Claude API", "Image scanning", "Landing page"],
+    stack: ["React Native", "AI-powered", "Image scanning", "Landing page"],
     cover: "scan" as const,
     url: "https://thevaultr.com",
     urlLabel: "thevaultr.com",

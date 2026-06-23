@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SITE } from "@/lib/site";
 
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
     "AI app development",
     "MVP development",
     "React Native developer",
-    "Claude API",
+    "AI-powered apps",
     "Next.js developer",
     "small business websites",
   ],
@@ -78,6 +79,7 @@ export default function RootLayout({
       <body className="min-h-full">
         <div className="grain" aria-hidden="true" />
         {children}
+        <Analytics />
       </body>
     </html>
   );

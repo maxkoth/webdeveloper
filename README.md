@@ -74,11 +74,24 @@ states are visible, and motion is disabled under `prefers-reduced-motion`.
 
 | Category       | Mobile | Desktop |
 | -------------- | :----: | :-----: |
-| Performance    |   97   |   100   |
+| Performance    |  ~97   |   100   |
 | Accessibility  |  100   |   100   |
-| Best Practices |  100   |   100   |
+| Best Practices |  100*  |   100   |
 | SEO            |  100   |   100   |
+
+\* Tested locally, Best Practices reads 96 because the Vercel Web Analytics
+endpoint (`/_vercel/insights`) only exists on Vercel, so the beacon 500s during
+a local run. On the deployed site it resolves and the score returns to 100.
 
 Verified: `npm run build` passes with no type errors; every nav anchor and the
 `sms:` / `tel:` / `mailto:` links resolve correctly; layout is clean at 360px,
 768px, and 1280px; no console errors or warnings on load.
+
+## Analytics & lead tracking
+
+[`@vercel/analytics`](https://vercel.com/docs/analytics) is wired in. Enable
+**Web Analytics** once in the Vercel dashboard (Project → Analytics) and it
+starts collecting privacy-friendly, cookie-less traffic data. Every "Text me"
+and "Email me" click also fires a custom **`lead`** event tagged with `method`
+(text/email) and `placement` (hero/footer) — so you can see not just who
+visits, but who actually reaches out, and from where.

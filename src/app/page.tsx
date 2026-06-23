@@ -4,27 +4,66 @@ import WhatIBuild from "@/components/WhatIBuild";
 import SelectedWork from "@/components/SelectedWork";
 import HowIWork from "@/components/HowIWork";
 import About from "@/components/About";
+import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
-import { CONTACT, SITE } from "@/lib/site";
+import { CONTACT, FAQS, SITE } from "@/lib/site";
 
 // JSON-LD: helps the site describe itself to search engines as a real person/
-// service with reachable contact points.
+// service with reachable contact points, the services on offer, and FAQ
+// content eligible for rich results.
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: SITE.name,
-  url: SITE.url,
-  description: SITE.description,
-  founder: { "@type": "Person", name: "Max" },
-  email: CONTACT.email,
-  telephone: CONTACT.phoneDigits,
-  areaServed: "US",
-  knowsAbout: [
-    "AI application development",
-    "MVP development",
-    "React Native",
-    "Next.js",
-    "Small business websites",
+  "@graph": [
+    {
+      "@type": "ProfessionalService",
+      "@id": `${SITE.url}/#business`,
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.description,
+      founder: { "@type": "Person", name: "Max" },
+      email: CONTACT.email,
+      telephone: CONTACT.phoneDigits,
+      areaServed: [
+        { "@type": "City", name: "New York" },
+        { "@type": "Country", name: "United States" },
+      ],
+      knowsAbout: [
+        "AI application development",
+        "MVP development",
+        "React Native",
+        "Next.js",
+        "Small business websites",
+      ],
+      makesOffer: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "AI apps & startup MVPs",
+            description:
+              "AI-powered mobile and web apps and startup MVPs, built and shipped.",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Small-business websites",
+            description:
+              "Fast, mobile-first websites for local and small businesses.",
+          },
+        },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE.url}/#faq`,
+      mainEntity: FAQS.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
   ],
 };
 
@@ -48,6 +87,7 @@ export default function Home() {
         <SelectedWork />
         <HowIWork />
         <About />
+        <Faq />
       </main>
       <Footer />
     </>

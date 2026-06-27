@@ -8,7 +8,7 @@ export const SITE = {
   // One-line positioning. Leads with the product/AI work.
   tagline: "I build AI-powered apps, MVPs, and websites that ship.",
   description:
-    "Maximum Developer is Max — a freelance developer who builds AI-powered apps and MVPs for startups, and fast, working websites for local businesses. Text or email to start.",
+    "Maximum Developer is Max — a freelance developer who builds AI-powered apps and MVPs for startups, fast websites for local businesses, and white-label builds for agencies. Text or email to start.",
 } as const;
 
 export const CONTACT = {
@@ -36,6 +36,7 @@ export const HERO_META = [
 export const NAV_LINKS = [
   { href: "#what-i-build", label: "What I build" },
   { href: "#work", label: "Work" },
+  { href: "#for-agencies", label: "For agencies" },
   { href: "#how-i-work", label: "How I work" },
   { href: "#faq", label: "FAQ" },
 ] as const;
@@ -54,6 +55,10 @@ export const FAQS = [
   {
     q: "Do I need to be technical?",
     a: "No. Most of the founders I work with aren't engineers. You bring the idea and the domain knowledge; I handle the build and explain the trade-offs in plain language.",
+  },
+  {
+    q: "Do you work with agencies on a white-label basis?",
+    a: "Yes. If you run a digital, marketing, or web agency, I build under your brand — apps, AI features, and websites — as the silent partner behind the curtain. You keep the client relationship; your client never has to know I'm involved.",
   },
   {
     q: "Can you work on an app I already have?",

@@ -8,7 +8,7 @@ export default function Faq() {
     <section id="faq" className="border-b border-line" aria-labelledby="faq-heading">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <div id="faq-heading">
-          <SectionHeading index="05" label="FAQ" title="Straight answers." />
+          <SectionHeading index="06" label="FAQ" title="Straight answers." />
         </div>
 
         <div className="mt-14 flex flex-col gap-4">

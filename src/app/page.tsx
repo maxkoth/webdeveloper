@@ -2,6 +2,7 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import WhatIBuild from "@/components/WhatIBuild";
 import SelectedWork from "@/components/SelectedWork";
+import ForAgencies from "@/components/ForAgencies";
 import HowIWork from "@/components/HowIWork";
 import About from "@/components/About";
 import Faq from "@/components/Faq";
@@ -53,6 +54,15 @@ const jsonLd = {
               "Fast, mobile-first websites for local and small businesses.",
           },
         },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "White-label development for agencies",
+            description:
+              "White-label app, AI, and website development for digital and marketing agencies — built and shipped under the agency's brand.",
+          },
+        },
       ],
     },
     {
@@ -85,6 +95,7 @@ export default function Home() {
         <Hero />
         <WhatIBuild />
         <SelectedWork />
+        <ForAgencies />
         <HowIWork />
         <About />
         <Faq />

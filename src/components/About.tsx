@@ -6,7 +6,7 @@ export default function About() {
     <section id="about" className="border-b border-line" aria-labelledby="about-heading">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <div id="about-heading">
-          <SectionHeading index="04" label="About" title="Who you're hiring." />
+          <SectionHeading index="05" label="About" title="Who you're hiring." />
         </div>
 
         <Reveal className="mt-12 max-w-3xl">

@@ -34,7 +34,7 @@ export default function HowIWork() {
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <div id="how-i-work-heading">
           <SectionHeading
-            index="03"
+            index="04"
             label="How I work"
             title="Brief. Build. Ship. Support."
           />

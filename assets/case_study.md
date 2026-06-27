@@ -20,7 +20,7 @@ A consumer-facing **app + website** with one core experience that had to be grea
 full thing: product design, the AI scanning flow, the app, and the website.
 
 ### How it was built
-- **Stack:** `[FILL: e.g. React Native (iOS/Android), Next.js web, AI vision model / Claude]`
+- **Stack:** iOS, React Native, and web — with an AI vision model handling the card recognition.
 - **Timeline:** designed and shipped in **~1–2 months, solo.**
 - **Scope:** the complete product — frontend, the AI scanning pipeline, and the
   marketing site — not a prototype or a mockup.
@@ -58,4 +58,5 @@ hire, turn it down, or gamble on an unknown freelancer — that's where I come i
 ---
 
 *Want to see it work? Ask for the 90-second walkthrough.*
-*Contact: `[FILL: your email]` · `[FILL: portfolio/site URL]`*
+*Max — Maximum Developer · New York · iOS · React Native · Web · AI-powered builds*
+*Contact: maxkoth77@gmail.com · 646-462-1236 · maximumdeveloper.com*

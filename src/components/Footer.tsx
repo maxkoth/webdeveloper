@@ -15,7 +15,7 @@ export default function Footer() {
           </h2>
           <p className="mt-6 max-w-xl text-lg text-muted">
             Text or email me. Tell me what you&apos;re making. I&apos;ll tell you
-            straight whether I&apos;m the right person to build it.
+            straight whether we&apos;re the right team to build it.
           </p>
 
           <div className="mt-9">
@@ -25,7 +25,7 @@ export default function Footer() {
 
         <div className="mt-20 flex flex-col gap-6 border-t border-line pt-8 font-mono text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {SITE.name}. Built by Max.
+            © {new Date().getFullYear()} {SITE.name}.
           </p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <a href={CONTACT.tel} className="hover:text-paper">

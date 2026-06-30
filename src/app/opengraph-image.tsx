@@ -37,7 +37,7 @@ export default async function OpengraphImage() {
               textTransform: "uppercase",
             }}
           >
-            Freelance developer · Available
+            Development studio · Available
           </div>
         </div>
 

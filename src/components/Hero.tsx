@@ -37,7 +37,7 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-volt opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-volt" />
             </span>
-            Freelance developer · Available for new work
+            Development studio · Available for new work
           </p>
         </Reveal>
 
@@ -52,7 +52,7 @@ export default function Hero() {
 
         <Reveal delay={160}>
           <p className="mt-8 max-w-2xl text-balance text-xl leading-snug text-muted sm:text-2xl">
-            I&apos;m Max. I build{" "}
+            We build{" "}
             <span className="text-paper">AI-powered apps and MVPs</span> for
             startups, and{" "}
             <span className="text-paper">fast, working websites</span> for local

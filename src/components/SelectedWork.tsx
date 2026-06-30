@@ -9,7 +9,7 @@ const WORK = [
     kind: "AI · iOS",
     title: "Athlete performance & recruiting — AI layer",
     built:
-      "I built an AI layer on top of an existing iOS app for athlete performance and recruiting. It analyzes uploaded athlete videos to detect movement, flag performance issues, and automatically generate written coaching feedback.",
+      "We built an AI layer on top of an existing iOS app for athlete performance and recruiting. It analyzes uploaded athlete videos to detect movement, flag performance issues, and automatically generate written coaching feedback.",
     differentiator:
       "Turns raw video into coaching-grade feedback with no human in the loop.",
     stack: ["AI-powered", "React Native", "Mux", "Supabase", "AWS"],
@@ -21,7 +21,7 @@ const WORK = [
     kind: "AI · Mobile + Web",
     title: "Sports-card scanning app + landing site",
     built:
-      "I built a mobile app that scans trading cards, identifies and values them, and — unlike every competitor — recommends what to do with each card: grade, sell, or hold. It's made for casual collectors, not hobby experts, and ships with its own marketing landing page.",
+      "We built a mobile app that scans trading cards, identifies and values them, and — unlike every competitor — recommends what to do with each card: grade, sell, or hold. It's made for casual collectors, not hobby experts, and ships with its own marketing landing page.",
     differentiator:
       "A recommendation engine, not just a price lookup. Other apps show value; none tell you what to do next.",
     stack: ["React Native", "AI-powered", "Image scanning", "Landing page"],

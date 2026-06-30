@@ -6,9 +6,9 @@ export const SITE = {
   domain: "maximumdeveloper.com",
   url: "https://maximumdeveloper.com",
   // One-line positioning. Leads with the product/AI work.
-  tagline: "I build AI-powered apps, MVPs, and websites that ship.",
+  tagline: "We build AI-powered apps, MVPs, and websites that ship.",
   description:
-    "Maximum Developer is Max — a freelance developer who builds AI-powered apps and MVPs for startups, and fast, working websites for local businesses. Text or email to start.",
+    "Maximum Developer is a team of developers who build AI-powered apps and MVPs for startups, and fast, working websites for local businesses. Text or email to start.",
 } as const;
 
 export const CONTACT = {
@@ -34,9 +34,9 @@ export const HERO_META = [
 ] as const;
 
 export const NAV_LINKS = [
-  { href: "#what-i-build", label: "What I build" },
+  { href: "#what-i-build", label: "What we build" },
   { href: "#work", label: "Work" },
-  { href: "#how-i-work", label: "How I work" },
+  { href: "#how-i-work", label: "How we work" },
   { href: "#faq", label: "FAQ" },
 ] as const;
 
@@ -45,26 +45,26 @@ export const NAV_LINKS = [
 export const FAQS = [
   {
     q: "How much does a project cost?",
-    a: "Every build is scoped and priced up front — a fixed number after a short call, not an open-ended hourly meter. Text me what you're making and I'll tell you straight.",
+    a: "Every build is scoped and priced up front — a fixed number after a short call, not an open-ended hourly meter. Text us what you're making and we'll tell you straight.",
   },
   {
     q: "How long does it take?",
-    a: "A focused MVP is usually weeks, not months. A small-business website is often days. I set a realistic timeline before we start and show you progress the whole way through.",
+    a: "A focused MVP is usually weeks, not months. A small-business website is often days. We set a realistic timeline before we start and show you progress the whole way through.",
   },
   {
     q: "Do I need to be technical?",
-    a: "No. Most of the founders I work with aren't engineers. You bring the idea and the domain knowledge; I handle the build and explain the trade-offs in plain language.",
+    a: "No. Most of the founders we work with aren't engineers. You bring the idea and the domain knowledge; we handle the build and explain the trade-offs in plain language.",
   },
   {
     q: "Can you work on an app I already have?",
-    a: "Yes. I can add features or an AI-powered layer to something you've already built — one of my projects was exactly that: an AI layer on top of an existing iOS app.",
+    a: "Yes. We can add features or an AI-powered layer to something you've already built — one of our projects was exactly that: an AI layer on top of an existing iOS app.",
   },
   {
     q: "Who owns the code?",
-    a: "You do. You get full ownership of everything I build, handed over cleanly when it ships.",
+    a: "You do. You get full ownership of everything we build, handed over cleanly when it ships.",
   },
   {
     q: "Where are you based, and do you work remotely?",
-    a: "I'm in New York and work with clients anywhere. Most of the work happens over text, email, and the occasional call.",
+    a: "We're based in New York and work with clients anywhere. Most of the work happens over text, email, and the occasional call.",
   },
 ] as const;

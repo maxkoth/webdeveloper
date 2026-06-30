@@ -8,7 +8,7 @@ const SERVICES = [
   {
     tag: "Lead service",
     title: "AI apps & startup MVPs",
-    lede: "You have a product idea and need it real. I build it.",
+    lede: "You have a product idea and need it real. We build it.",
     points: [
       "A working mobile or web app you can put in front of users — not a prototype that dies in a demo.",
       "Real AI features that do a job: analyze video, read images, generate useful output. Not a chatbot bolted on.",
@@ -36,7 +36,7 @@ export default function WhatIBuild() {
     >
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <div id="what-i-build-heading">
-          <SectionHeading index="01" label="What I build" title="Two things, done well." />
+          <SectionHeading index="01" label="What we build" title="Two things, done well." />
         </div>
 
         <div className="mt-14 grid gap-4 md:grid-cols-2">

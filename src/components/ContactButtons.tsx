@@ -28,7 +28,7 @@ export default function ContactButtons({
         className={`group glow-volt inline-flex items-center justify-center gap-2 rounded-full bg-volt font-semibold tracking-tight text-ink hover:-translate-y-0.5 ${pad}`}
       >
         <ChatIcon />
-        Text me
+        Text us
         <span className="font-mono text-[0.8em] font-normal opacity-70">
           {CONTACT.phoneDisplay}
         </span>
@@ -40,7 +40,7 @@ export default function ContactButtons({
         className={`group inline-flex items-center justify-center gap-2 rounded-full border border-paper/30 font-semibold tracking-tight text-paper transition-colors duration-200 hover:border-volt hover:text-volt ${pad}`}
       >
         <MailIcon />
-        Email me
+        Email us
       </a>
     </div>
   );

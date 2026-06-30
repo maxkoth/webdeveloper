@@ -153,7 +153,7 @@ export default function Nav() {
             href={CONTACT.mailto}
             className="inline-flex items-center justify-center rounded-full border border-paper/30 px-5 py-3 font-semibold text-paper"
           >
-            Email me
+            Email us
           </a>
         </div>
       </div>

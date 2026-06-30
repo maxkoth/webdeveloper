@@ -10,7 +10,7 @@ const STEPS = [
   {
     n: "02",
     title: "Build",
-    body: "I build it and show you progress as it happens, not at the end. You see the real thing early and steer while it's cheap to change.",
+    body: "We build it and show you progress as it happens, not at the end. You see the real thing early and steer while it's cheap to change.",
   },
   {
     n: "03",
@@ -20,7 +20,7 @@ const STEPS = [
   {
     n: "04",
     title: "Support",
-    body: "After launch I'm still reachable. Fixes, tweaks, and the next round of features when you're ready to grow.",
+    body: "After launch we're still reachable. Fixes, tweaks, and the next round of features when you're ready to grow.",
   },
 ] as const;
 
@@ -35,7 +35,7 @@ export default function HowIWork() {
         <div id="how-i-work-heading">
           <SectionHeading
             index="03"
-            label="How I work"
+            label="How we work"
             title="Brief. Build. Ship. Support."
           />
         </div>

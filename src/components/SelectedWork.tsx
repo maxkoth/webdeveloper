@@ -131,7 +131,7 @@ function MotionArt() {
     >
       <defs>
         <pattern id="mgrid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M40 0H0V40" fill="none" stroke="rgba(245,243,236,0.06)" strokeWidth="1" />
+          <path d="M40 0H0V40" fill="none" stroke="rgba(26,23,20,0.08)" strokeWidth="1" />
         </pattern>
       </defs>
       <rect width="400" height="320" fill="url(#mgrid)" />
@@ -191,8 +191,8 @@ function ScanArt() {
         opacity="0.9"
       />
       <circle cx="200" cy="120" r="20" fill="none" stroke="var(--color-volt)" strokeWidth="3" />
-      <rect x="168" y="160" width="64" height="6" rx="3" fill="rgba(245,243,236,0.4)" />
-      <rect x="168" y="176" width="44" height="6" rx="3" fill="rgba(245,243,236,0.25)" />
+      <rect x="168" y="160" width="64" height="6" rx="3" fill="rgba(26,23,20,0.28)" />
+      <rect x="168" y="176" width="44" height="6" rx="3" fill="rgba(26,23,20,0.16)" />
       {/* scan reticle corners */}
       <g stroke="var(--color-volt)" strokeWidth="3" fill="none">
         <path d="M120 60 V40 H140" />
@@ -204,7 +204,7 @@ function ScanArt() {
       {/* decision tag */}
       <g transform="translate(232,210)">
         <rect width="64" height="28" rx="14" fill="var(--color-volt)" />
-        <text x="32" y="19" textAnchor="middle" fontFamily="monospace" fontSize="13" fontWeight="700" fill="#0a0a0b">
+        <text x="32" y="19" textAnchor="middle" fontFamily="monospace" fontSize="13" fontWeight="700" fill="#F8F5EF">
           HOLD
         </text>
       </g>

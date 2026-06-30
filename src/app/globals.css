@@ -3,24 +3,26 @@
 /*
   DESIGN DECISION
   ----------------
-  One committed move: an editorial-brutalist system in near-black + warm
-  off-white, anchored by a SINGLE high-voltage accent (electric lime, --volt).
-  Type does the heavy lifting: oversized "Archivo" display weights set tight
-  and left-aligned (never the centered-hero look), with "JetBrains Mono" for
-  section labels, indices, and stack tags. This reads as a builder's site —
-  confident and a little aggressive, matching the "Maximum" name — and pointedly
-  avoids the generic AI-startup template (centered hero, three line-icon cards,
-  purple gradient, Inter everywhere).
+  Warm editorial light — cream canvas, near-black type, single deep forest-green
+  accent. The feel: a high-end creative studio or a well-made print magazine.
+  Same confident typographic identity, none of the neon aggression.
+
+  Token names are preserved so Tailwind class names stay unchanged throughout
+  the codebase. Only the values flip:
+    --color-ink        → warm ivory canvas (was: near-black)
+    --color-ink-raised → cream card surface (was: dark raised panel)
+    --color-paper      → near-black text   (was: warm off-white)
+    --color-volt       → deep forest green (was: electric lime)
 */
 
 @theme {
-  --color-ink: #0a0a0b; /* canvas */
-  --color-ink-raised: #131316; /* cards / raised surfaces */
-  --color-paper: #f5f3ec; /* primary text, warm off-white */
-  --color-muted: #b6b2a6; /* secondary text — AA on ink */
-  --color-volt: #c6f135; /* the single accent */
-  --color-volt-deep: #9fc400; /* deeper accent variant */
-  --color-line: rgba(245, 243, 236, 0.12); /* hairlines */
+  --color-ink: #F8F5EF;                     /* warm ivory canvas */
+  --color-ink-raised: #EDE9E0;              /* card surfaces */
+  --color-paper: #1A1714;                   /* primary text, near-black */
+  --color-muted: #6E6860;                   /* secondary text — AA on ivory */
+  --color-volt: #2A5C3F;                    /* deep forest green accent */
+  --color-volt-deep: #1E4530;              /* deeper green variant */
+  --color-line: rgba(26, 23, 20, 0.1);     /* hairlines */
 
   --font-display: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
   --font-sans: var(--font-archivo), system-ui, sans-serif;
@@ -30,7 +32,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5.5rem; /* offset for sticky nav on anchor jumps */
+    scroll-padding-top: 5.5rem;
   }
 
   body {
@@ -41,7 +43,6 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Visible, on-brand focus ring for keyboard navigation. */
   :focus-visible {
     outline: 2px solid var(--color-volt);
     outline-offset: 3px;
@@ -50,12 +51,11 @@
 
   ::selection {
     background: var(--color-volt);
-    color: #0a0a0b;
+    color: var(--color-ink);
   }
 }
 
 @layer utilities {
-  /* Tight, optical display type. */
   .display {
     font-family: var(--font-display);
     font-weight: 800;
@@ -72,18 +72,19 @@
   }
 
   /*
-    Raised surface (cards): a faint top highlight + inner hairline reads as a
-    panel catching light, not a flat fill. Hover lifts it toward the accent.
+    Card surface: elevated paper on cream. A faint white highlight on the top
+    edge reads as a sheet catching light from above — premium paper stock feel.
+    Shadow provides gentle lift. Hover reveals a subtle accent inset ring.
   */
   .surface {
     position: relative;
-    background:
-      linear-gradient(180deg, rgba(245, 243, 236, 0.04), transparent 38%),
-      var(--color-ink-raised);
+    background: var(--color-ink-raised);
+    box-shadow:
+      0 1px 3px rgba(26, 23, 20, 0.05),
+      0 6px 24px rgba(26, 23, 20, 0.04);
     transition:
       transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 0.35s ease,
-      background-color 0.35s ease;
+      box-shadow 0.35s ease;
   }
   .surface::before {
     content: "";
@@ -91,24 +92,24 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(180deg, rgba(245, 243, 236, 0.14), transparent 50%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent 40%);
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
       linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    opacity: 0.7;
+    opacity: 0.65;
     pointer-events: none;
     transition: opacity 0.35s ease;
   }
   .group\/card:hover .surface,
   .surface:hover {
     box-shadow:
-      0 1px 0 0 rgba(198, 241, 53, 0.25) inset,
-      0 24px 60px -24px rgba(0, 0, 0, 0.8);
+      0 0 0 1px rgba(42, 92, 63, 0.14) inset,
+      0 4px 12px rgba(26, 23, 20, 0.07),
+      0 16px 48px rgba(26, 23, 20, 0.09);
   }
 
-  /* Animated, accent underline for nav links (no layout shift). */
   .nav-link {
     position: relative;
   }
@@ -129,18 +130,16 @@
     transform: scaleX(1);
   }
 
-  /* Soft volt glow on the primary CTA. */
   .glow-volt {
-    box-shadow: 0 0 0 0 rgba(198, 241, 53, 0);
+    box-shadow: 0 0 0 0 rgba(42, 92, 63, 0);
     transition:
       box-shadow 0.3s ease,
       transform 0.2s ease;
   }
   .glow-volt:hover {
-    box-shadow: 0 10px 40px -12px rgba(198, 241, 53, 0.55);
+    box-shadow: 0 10px 40px -12px rgba(42, 92, 63, 0.45);
   }
 
-  /* Entrance motion driven by IntersectionObserver (see Reveal.tsx). */
   .reveal {
     opacity: 0;
     transform: translateY(18px);
@@ -156,20 +155,18 @@
 }
 
 /*
-  Film-grain overlay — a faint, fixed noise layer over the whole page. Gives the
-  flat dark canvas a premium, printed texture instead of dead pixels. It's a
-  single inlined SVG (no network request) and pointer-events:none.
+  Film-grain overlay — faint noise that reads as premium coated paper on the
+  cream canvas. Single inlined SVG, zero requests, pointer-events: none.
 */
 .grain {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.04;
+  opacity: 0.045;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Quiet scroll cue at the foot of the hero. */
 @keyframes cue {
   0%,
   100% {
@@ -185,7 +182,6 @@
   animation: cue 2s ease-in-out infinite;
 }
 
-/* Respect users who don't want motion. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

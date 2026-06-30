@@ -15,7 +15,7 @@ export default async function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0a0a0b",
+          background: "#F8F5EF",
           padding: "72px 80px",
           fontFamily: "sans-serif",
         }}
@@ -25,13 +25,13 @@ export default async function OpengraphImage() {
             style={{
               width: 18,
               height: 18,
-              background: "#c6f135",
+              background: "#2A5C3F",
               transform: "rotate(45deg)",
             }}
           />
           <div
             style={{
-              color: "#b6b2a6",
+              color: "#6E6860",
               fontSize: 26,
               letterSpacing: 4,
               textTransform: "uppercase",
@@ -47,7 +47,7 @@ export default async function OpengraphImage() {
               display: "flex",
               fontSize: 132,
               fontWeight: 800,
-              color: "#f5f3ec",
+              color: "#1A1714",
               lineHeight: 1,
               letterSpacing: -4,
             }}
@@ -59,7 +59,7 @@ export default async function OpengraphImage() {
               display: "flex",
               fontSize: 132,
               fontWeight: 800,
-              color: "#c6f135",
+              color: "#2A5C3F",
               lineHeight: 1,
               letterSpacing: -4,
             }}
@@ -68,7 +68,7 @@ export default async function OpengraphImage() {
           </div>
         </div>
 
-        <div style={{ color: "#b6b2a6", fontSize: 34, maxWidth: 900 }}>
+        <div style={{ color: "#6E6860", fontSize: 34, maxWidth: 900 }}>
           AI-powered apps & MVPs for startups. Fast, working sites for
           businesses. Built and shipped.
         </div>

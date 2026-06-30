@@ -9,25 +9,25 @@ export default function Hero() {
       className="relative isolate overflow-hidden border-b border-line"
       aria-labelledby="hero-heading"
     >
-      {/* Single accent flourish — a faint volt grid, not a purple gradient. */}
+      {/*
+        Concentric arc motif — precision over flash. Two ghost rings emerge from
+        the upper-right corner like the face of a compass or a watchmaker's
+        diagram. They're barely there; the type does the work.
+      */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--color-volt) 1px, transparent 1px), linear-gradient(90deg, var(--color-volt) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage: "radial-gradient(circle at 70% 20%, black, transparent 70%)",
-        }}
+        className="pointer-events-none absolute -right-40 -top-40 h-[52rem] w-[52rem] rounded-full"
+        style={{ border: "1px solid rgba(42,92,63,0.10)" }}
       />
-      {/* Soft volt glow seated behind the headline for depth. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/4 h-[42rem] w-[42rem] -translate-x-1/3 rounded-full opacity-[0.16] blur-[120px]"
-        style={{
-          background:
-            "radial-gradient(circle, var(--color-volt), transparent 65%)",
-        }}
+        className="pointer-events-none absolute -right-20 -top-20 h-[34rem] w-[34rem] rounded-full"
+        style={{ border: "1px solid rgba(42,92,63,0.07)" }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-4 top-4 h-[20rem] w-[20rem] rounded-full"
+        style={{ border: "1px solid rgba(42,92,63,0.05)" }}
       />
 
       <div className="mx-auto max-w-6xl px-5 pb-16 pt-32 sm:px-8 sm:pb-20 sm:pt-40">
@@ -75,7 +75,6 @@ export default function Hero() {
           </div>
         </Reveal>
 
-        {/* Credibility meta strip — honest facts, not invented metrics. */}
         <Reveal delay={320}>
           <ul className="mt-14 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line pt-6 font-mono text-xs text-muted">
             {HERO_META.map((item, i) => (
@@ -92,7 +91,6 @@ export default function Hero() {
         </Reveal>
       </div>
 
-      {/* Quiet scroll cue. */}
       <a
         href="#what-i-build"
         aria-label="Scroll to what I build"

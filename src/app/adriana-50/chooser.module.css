@@ -1,0 +1,89 @@
+/* Index page listing the five poster options — quiet, dark, gold-on-black. */
+
+.stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: radial-gradient(120% 90% at 50% 0%, #171410 0%, #0b0a08 55%, #060505 100%);
+}
+
+.heading {
+  font-size: clamp(1.3rem, 5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  background-image: linear-gradient(100deg, #8a6418, #f9e7b3 50%, #8a6418);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sub {
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  font-style: italic;
+  color: #cdb87f;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: min(100%, 480px);
+  padding: 0;
+  margin: 0;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.1rem 1.4rem;
+  border: 1px solid rgba(212, 164, 55, 0.4);
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: #d4a437;
+  transform: translateY(-2px);
+}
+
+.cardNum {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #d4a437;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cardLabel {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f0dfae;
+  /* keep the label legible on the light champagne card too */
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+.cardBlurb {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #e6dcc2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
